@@ -137,10 +137,6 @@ const Audio = {
             this.masterGain = this.ctx.createGain();
             this.masterGain.gain.value = 0.35;
             this.masterGain.connect(this.ctx.destination);
-            // BGM gain node
-            this.bgmGain = this.ctx.createGain();
-            this.bgmGain.gain.value = 0.6;
-            this.bgmGain.connect(this.masterGain);
         } catch (e) {
             this.enabled = false;
         }
@@ -148,14 +144,6 @@ const Audio = {
 
     resume() {
         if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
-    },
-
-    setMasterVolume(v) {
-        if (this.masterGain) this.masterGain.gain.value = v;
-    },
-
-    setMusicVolume(v) {
-        if (this.bgmGain) this.bgmGain.gain.value = v;
     },
 
     _tone(freq, duration, type = 'sine', volume = 0.15, delay = 0) {
@@ -384,15 +372,15 @@ const Audio = {
         // Persistent gain nodes for mixing
         const leadGain = this.ctx.createGain();
         leadGain.gain.value = 0.035;
-        leadGain.connect(this.bgmGain);
+        leadGain.connect(this.masterGain);
 
         const bassGain = this.ctx.createGain();
         bassGain.gain.value = 0.025;
-        bassGain.connect(this.bgmGain);
+        bassGain.connect(this.masterGain);
 
         const harmonyGain = this.ctx.createGain();
         harmonyGain.gain.value = 0.015;
-        harmonyGain.connect(this.bgmGain);
+        harmonyGain.connect(this.masterGain);
 
         const percFilter = this.ctx.createBiquadFilter();
         percFilter.type = 'highpass';
@@ -400,7 +388,7 @@ const Audio = {
         const percGain = this.ctx.createGain();
         percGain.gain.value = 0.03;
         percFilter.connect(percGain);
-        percGain.connect(this.bgmGain);
+        percGain.connect(this.masterGain);
 
         const playBar = () => {
             if (!this._bgm) return;

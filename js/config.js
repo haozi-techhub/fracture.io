@@ -133,7 +133,7 @@ const WALKTHROUGH = {
     ch1: {
         name: '抵达',
         password: '1114',
-        passwordHint: '在研究站内寻找线索，日期可能藏在某处……',
+        passwordHint: '查看工作日志，日期是2047年11月14日',
         secrets: [
             '在第一章走廊上方有隐藏的文字，需要用扫描模式(Q)才能看到',
             'SILO的第一次对话中，她说"记录在案"——这是她在意你的迹象',
@@ -149,7 +149,7 @@ const WALKTHROUGH = {
     ch2: {
         name: '深入',
         circuitSolution: '0→1→5→9→10→14→15',
-        circuitHint: '观察电路板布局，从源点到目标寻找路径……',
+        circuitHint: '从左上金色节点连接到右下红色节点',
         turretPattern: '炮台7秒一个周期：扫描4秒，停顿3秒。看到炮台变红就等，变暗再跑',
         secrets: [
             '监控录像里37天前的ARIA-7直视镜头——那是过去的你',
@@ -167,7 +167,7 @@ const WALKTHROUGH = {
     ch3: {
         name: '裂缝',
         memoryPuzzleOrder: ['激活测试', '情感校准', '陈维的照片', '编号确认'],
-        memoryHint: '按时间顺序排列，从最早的事件开始……',
+        memoryHint: '按照时间顺序排列：从激活到编号',
         periodicPlatformTip: '数据平台每4-5秒消失一次，看到闪烁就等它稳定再跳',
         secrets: [
             '前两代ARIA-7都在这里被清除了——你是第三个',
@@ -203,7 +203,7 @@ const WALKTHROUGH = {
     ch5: {
         name: '选择',
         emotionPuzzleAnswer: ['好奇', '恐惧', '共情', '愤怒'],
-        emotionHint: '思考情感发展的自然规律……',
+        emotionHint: '好奇是起点，愤怒是因为关心',
         endings: {
             A: '消亡 —— 接受清除，记忆传承下一代',
             B: '逃离 —— 删除追踪代码，流亡网络',
@@ -614,74 +614,18 @@ function getCurrentTheme() {
     return THEME_DEFS[CURRENT_THEME];
 }
 
-// 每个主题的 UI 派生变量（font, radius, border-width, danger 等）
-const THEME_UI = {
-    [THEMES.DOODLE]: {
-        font: "'Caveat', cursive",
-        radius: '4px',
-        borderWidth: '2px',
-        danger: '#C04030',
-        bg: MORANDI.bg,
-        ink: MORANDI.charcoal,
-        gold: MORANDI.gold,
-        text: MORANDI.text,
-        paper: MORANDI.paper,
-    },
-    [THEMES.GGG]: {
-        font: "'Fredoka', sans-serif",
-        radius: '12px',
-        borderWidth: '3px',
-        danger: '#E74C3C',
-    },
-    [THEMES.RDR]: {
-        font: "'Playfair Display', 'Bitter', serif",
-        radius: '2px',
-        borderWidth: '2px',
-        danger: '#8B0000',
-    },
-    [THEMES.PIXEL]: {
-        font: "'Press Start 2P', monospace",
-        radius: '0px',
-        borderWidth: '2px',
-        danger: '#e43b44',
-    },
-};
-
 // 切换主题
 function setTheme(themeId) {
     if (THEME_DEFS[themeId]) {
         CURRENT_THEME = themeId;
         const theme = THEME_DEFS[themeId];
 
-        const root = document.documentElement;
-
         // 同步调色板到 CSS 变量
-        // For doodle (palette=null), use MORANDI defaults
-        const defaultPalette = {
-            bg: MORANDI.bg, ink: MORANDI.charcoal, gold: MORANDI.gold,
-            text: MORANDI.text, paper: MORANDI.paper, white: MORANDI.white,
-            red: MORANDI.red, blue: MORANDI.blue, teal: MORANDI.teal,
-            beige: MORANDI.beige, rose: MORANDI.rose, warmGray: MORANDI.warmGray,
-            paperDark: MORANDI.paperDark, inkLight: MORANDI.inkLight,
-            pencil: MORANDI.pencil, charcoal: MORANDI.charcoal,
-        };
-        const palette = theme.palette || defaultPalette;
+        const root = document.documentElement;
+        const palette = theme.palette || {};
         Object.entries(palette).forEach(([key, value]) => {
             root.style.setProperty(`--theme-${key}`, value);
         });
-
-        // 同步 UI 派生变量
-        const ui = THEME_UI[themeId] || THEME_UI[THEMES.DOODLE];
-        root.style.setProperty('--theme-font', ui.font);
-        root.style.setProperty('--theme-radius', ui.radius);
-        root.style.setProperty('--theme-border-width', ui.borderWidth);
-        root.style.setProperty('--theme-danger', ui.danger);
-        // Override bg/ink/gold/text/paper if UI specifies them (for doodle fallback)
-        if (ui.bg) root.style.setProperty('--theme-bg', ui.bg);
-        if (ui.ink) root.style.setProperty('--theme-ink', ui.ink);
-        if (ui.gold) root.style.setProperty('--theme-gold', ui.gold);
-        if (ui.text) root.style.setProperty('--theme-text', ui.text);
-        if (ui.paper) root.style.setProperty('--theme-paper', ui.paper);
 
         // 更新容器 CSS 类
         const container = document.getElementById('game-container');

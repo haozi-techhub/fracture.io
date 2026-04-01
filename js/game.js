@@ -666,21 +666,6 @@ const World = {
             // Apply color tint for collapse warning
             const platformColor = p._collapsing ? Renderer._darken(colors.platform, 0.2) : colors.platform;
             Renderer.drawPlatform(drawX, drawY, p.w, p.h, platformColor, cam, p.style);
-
-            // RIP marker for platforms with 3+ deaths
-            const platKey = `p_${Math.floor((p.x + p.w/2) / 100)}_${Math.floor((p.y + p.h/2) / 100)}`;
-            const platDeaths = Game._platformDeaths ? Game._platformDeaths[platKey] : 0;
-            if (platDeaths >= 3) {
-                const ctx = Renderer.ctx;
-                const screenX = drawX - cam.x + p.w / 2;
-                const screenY = drawY - cam.y + p.h / 2;
-                ctx.save();
-                ctx.font = 'bold 14px monospace';
-                ctx.fillStyle = 'rgba(180, 60, 60, 0.9)';
-                ctx.textAlign = 'center';
-                ctx.fillText(`RIP ×${platDeaths}`, screenX, screenY + 5);
-                ctx.restore();
-            }
         }
 
         // Decorations
@@ -788,7 +773,7 @@ const Game = {
 
     init() {
         this.state = GAME_STATES.MENU;
-        // Title screen activation is handled by style picker in main.js
+        document.getElementById('title-screen').classList.add('active');
     },
 
     startGame() {
@@ -1084,22 +1069,6 @@ const Game = {
         if (trigger) {
             this.executeTrigger(trigger);
         }
-
-        // SILO idle wave - after 30 seconds of no movement in playing state
-        if (this.state === GAME_STATES.PLAYING && !this._siloWaveShown) {
-            const isMoving = Input.left || Input.right || Input.jump || Input.interact;
-            if (isMoving) {
-                this._lastActivityTime = Date.now();
-            } else {
-                const idleTime = (Date.now() - (this._lastActivityTime || Date.now())) / 1000;
-                if (idleTime > 30) {
-                    this._siloWaveShown = true;
-                    this.startDialogue([
-                        { speaker: 'SILO', text: '（向玩家挥手）……你还在吗？看起来你已经站在那里很久了。' },
-                    ]);
-                }
-            }
-        }
     },
 
     triggerInteraction(obj) {
@@ -1120,13 +1089,6 @@ const Game = {
         }
         if (obj.flag) {
             this.flags[obj.flag] = true;
-            // Track secret discoveries
-            if (obj.flag.includes('secret') || obj.flag.includes('hint')) {
-                Game._secretsFound = (Game._secretsFound || 0) + 1;
-                if (Game._secretsFound >= 5) {
-                    Game._allSecretsFound = true;
-                }
-            }
         }
     },
 
@@ -1315,13 +1277,38 @@ const Game = {
         let state = new Array(size * size).fill(false);
         if (config.sources) config.sources.forEach(i => state[i] = true);
 
+        // Calculate hint path for visual guide
+        const hintPath = [];
+        const pathNodes = [0, 1, 5, 9, 10, 14, 15]; // The solution path
+        for (let i = 0; i < pathNodes.length - 1; i++) {
+            const from = pathNodes[i];
+            const to = pathNodes[i + 1];
+            const fromRow = Math.floor(from / size);
+            const fromCol = from % size;
+            const toRow = Math.floor(to / size);
+            const toCol = to % size;
+            hintPath.push({ fromRow, fromCol, toRow, toCol });
+        }
+
         container.innerHTML = `
+            <div class="circuit-hint-text">提示：从左上（金色）出发，依次连接：右→下→下→右→下→右→到达右下（红色）</div>
             <div class="circuit-grid" style="grid-template-columns: repeat(${size}, 48px);" id="circuit-grid">
                 ${state.map((s, i) => {
                     const cls = config.sources?.includes(i) ? 'source' :
                                 config.targets?.includes(i) ? 'target' : '';
                     return `<div class="circuit-node ${cls} ${s ? 'active' : ''}" data-idx="${i}"></div>`;
                 }).join('')}
+            </div>
+            <div class="circuit-path-hint" id="circuit-path-hint">
+                <svg width="${size * 48}" height="${size * 48}" style="position:absolute;pointer-events:none;opacity:0.2">
+                    ${hintPath.map(p => {
+                        const x1 = p.fromCol * 48 + 24;
+                        const y1 = p.fromRow * 48 + 24;
+                        const x2 = p.toCol * 48 + 24;
+                        const y2 = p.toRow * 48 + 24;
+                        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#7EFFD4" stroke-width="4" stroke-linecap="round"/>`;
+                    }).join('')}
+                </svg>
             </div>
         `;
         container.querySelectorAll('.circuit-node').forEach(node => {

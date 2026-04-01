@@ -46,7 +46,6 @@
                     莫兰迪配色 · 鹅鸭杀风格<br><br>
                     ARIA-7 · 陈维博士 · SILO · 幽影/ARIA-6
                 </div>
-                ${Game._allSecretsFound ? '<div style="color:#B8860B;font-size:16px;letter-spacing:4px;margin-bottom:20px;">FRACTURE 2: 深渊之下... 敬请期待</div>' : ''}
                 <div style="display:flex;gap:14px;">
                     <button class="menu-btn" id="btn-restart">重新开始</button>
                     <button class="menu-btn secondary" id="btn-back-title">返回标题</button>
@@ -101,7 +100,6 @@
         titleScreen.classList.add('active');
         bindMenuEvents();
         bindTipsToggle();
-        initThemeSelector();
     }
 
     /* ---- Tips Panel Toggle ---- */
@@ -1041,170 +1039,6 @@
         cinematic.render();
     }
 
-    /* ---- HUD Settings & Exit ---- */
-    function initHUDSettings() {
-        const settingsOverlay = document.getElementById('settings-overlay');
-        const hudSettingsBtn = document.getElementById('hud-settings-btn');
-        const hudExitBtn = document.getElementById('hud-exit-btn');
-        const settingsCloseBtn = document.getElementById('btn-settings-close');
-        const settingsResumeBtn = document.getElementById('btn-settings-resume');
-        const settingsQuitBtn = document.getElementById('btn-settings-quit');
-        const sfxSlider = document.getElementById('sfx-volume');
-        const musicSlider = document.getElementById('music-volume');
-        const sfxVal = document.getElementById('sfx-volume-val');
-        const musicVal = document.getElementById('music-volume-val');
-        const fpsToggle = document.getElementById('show-fps');
-
-        // Volume sliders
-        sfxSlider.addEventListener('input', () => {
-            const v = sfxSlider.value / 100;
-            Audio.setMasterVolume(v * 0.35);
-            sfxVal.textContent = sfxSlider.value + '%';
-        });
-        musicSlider.addEventListener('input', () => {
-            const v = musicSlider.value / 100;
-            Audio.setMusicVolume(v);
-            musicVal.textContent = musicSlider.value + '%';
-        });
-
-        // FPS toggle
-        fpsToggle.addEventListener('change', () => {
-            Game._showFPS = fpsToggle.checked;
-        });
-
-        // Settings button in HUD
-        hudSettingsBtn.addEventListener('click', () => {
-            settingsOverlay.classList.remove('hidden');
-            Game._prevState = GAME_STATES.PLAYING;
-            Game.state = GAME_STATES.MENU;
-        });
-
-        // Exit button in HUD
-        hudExitBtn.addEventListener('click', () => {
-            const exitConfirm = document.getElementById('exit-confirm');
-            exitConfirm.classList.remove('hidden');
-            Game._prevState = GAME_STATES.PLAYING;
-            Game.state = GAME_STATES.MENU;
-        });
-
-        // Close settings
-        settingsCloseBtn.addEventListener('click', () => {
-            settingsOverlay.classList.add('hidden');
-            Game.state = GAME_STATES.PLAYING;
-        });
-
-        // Resume button
-        settingsResumeBtn.addEventListener('click', () => {
-            settingsOverlay.classList.add('hidden');
-            Game.state = GAME_STATES.PLAYING;
-        });
-
-        // Quit to menu button
-        settingsQuitBtn.addEventListener('click', () => {
-            settingsOverlay.classList.add('hidden');
-            quitToMenu();
-        });
-
-        // Exit confirm dialog buttons
-        const exitConfirm = document.getElementById('exit-confirm');
-        const exitYesBtn = document.getElementById('btn-exit-yes');
-        const exitNoBtn = document.getElementById('btn-exit-no');
-
-        exitYesBtn.addEventListener('click', () => {
-            exitConfirm.classList.add('hidden');
-            quitToMenu();
-        });
-
-        exitNoBtn.addEventListener('click', () => {
-            exitConfirm.classList.add('hidden');
-            Game.state = GAME_STATES.PLAYING;
-        });
-    }
-
-    function quitToMenu() {
-        // Stop ambient
-        Audio.stopAmbient();
-        Audio.stopBGM();
-
-        // Reset game state
-        Game.state = GAME_STATES.MENU;
-        Game._totalDeaths = 0;
-
-        // Hide HUD and overlays
-        document.getElementById('hud').classList.add('hidden');
-        document.getElementById('settings-overlay').classList.add('hidden');
-        document.getElementById('exit-confirm').classList.add('hidden');
-
-        // Restore title screen
-        restoreTitle();
-    }
-
-    /* ---- Style Picker (Initial Theme Selection) ---- */
-    function initStylePicker() {
-        const picker = document.getElementById('style-picker');
-        const grid = document.getElementById('style-picker-grid');
-        if (!picker || !grid) {
-            // No picker in DOM, start normally
-            startAfterStylePick();
-            return;
-        }
-
-        // If user already has a saved theme preference, skip the picker
-        const savedTheme = localStorage.getItem('fracture_theme');
-        if (savedTheme && THEME_DEFS[savedTheme]) {
-            picker.classList.remove('active');
-            picker.classList.add('hidden');
-            startAfterStylePick();
-            return;
-        }
-
-        // Mark current theme as selected
-        const cards = grid.querySelectorAll('.style-card');
-        cards.forEach(card => {
-            const themeId = card.dataset.theme;
-
-            card.addEventListener('click', () => {
-                Audio.resume();
-                Audio.playMenuClick();
-
-                // Apply theme
-                setTheme(themeId);
-                saveThemePreference();
-
-                // Animate selection
-                cards.forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-
-                // Fade out picker, start game
-                setTimeout(() => {
-                    picker.style.transition = 'opacity 0.6s ease';
-                    picker.style.opacity = '0';
-                    setTimeout(() => {
-                        picker.classList.remove('active');
-                        picker.classList.add('hidden');
-                        picker.style.opacity = '';
-                        picker.style.transition = '';
-                        startAfterStylePick();
-                    }, 600);
-                }, 300);
-            });
-        });
-    }
-
-    function startAfterStylePick() {
-        // Show title screen and start cinematic
-        document.getElementById('title-screen').classList.add('active');
-
-        // Save original title HTML for restoring after credits
-        _originalTitleHTML = document.getElementById('title-screen').innerHTML;
-
-        // Initialize cinematic
-        cinematic.init();
-        bindMenuEvents();
-        bindTipsToggle();
-        initThemeSelector();
-    }
-
     /* ---- Initialize Everything ---- */
     function init() {
         Renderer.init();
@@ -1213,14 +1047,17 @@
         Game.init();
         Game.renderTitle = animateTitle;
 
-        // Theme system (load preference)
+        // Save original title HTML for restoring after credits
+        _originalTitleHTML = document.getElementById('title-screen').innerHTML;
+
+        // Initialize cinematic
+        cinematic.init();
+        bindMenuEvents();
+        bindTipsToggle();
+
+        // Theme system
         loadThemePreference();
-
-        // HUD Settings & Exit buttons
-        initHUDSettings();
-
-        // Show style picker or skip to cinematic
-        initStylePicker();
+        initThemeSelector();
 
         // Start main game loop
         requestAnimationFrame(gameLoop);

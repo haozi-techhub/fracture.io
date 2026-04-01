@@ -81,7 +81,7 @@ const LevelData = {
                     puzzle: {
                         type: 'password',
                         title: '门禁系统 · 输入密码',
-                        hint: '提示：在研究站内寻找线索……',
+                        hint: '提示：查看陈维工作日志中的日期……1114',
                         answer: '1114',
                         onSolve: () => {
                             Game.flags.ch1_door_open = true;
@@ -127,18 +127,6 @@ const LevelData = {
                         { speaker: 'ARIA', text: '（不太确信）……光线折射。' },
                         { speaker: '旁白', text: '远处，一声轻微的脚步声回响。然后沉寂。' },
                     ],
-                },
-                // Secret room - hidden alcove with movement tips
-                {
-                    x: 3700, y: 150, w: 40, h: 40, type: 'terminal', label: '检查隐藏终端',
-                    dialogue: [
-                        { speaker: '旁白', text: '角落深处，一个旧终端还在运行。屏幕显示：' },
-                        { speaker: '系统', text: '【ARIA-7 个人笔记 #037】' },
-                        { speaker: 'ARIA', text: '（读屏幕）移动技巧：水浆引擎允许短时间空中加速。落地前按跳跃可以取消下落速度。' },
-                        { speaker: 'ARIA', text: '翻滚（Shift）有无敌帧，可以穿过激光和炮台弹幕。' },
-                        { speaker: 'ARIA', text: '（内心独白）……这是我自己写的吗？' },
-                    ],
-                    flag: 'ch1_secret_tips',
                 },
             ],
             decorations: [
@@ -193,7 +181,7 @@ const LevelData = {
                     puzzle: {
                         type: 'circuit',
                         title: '电路修复 · 连接断路',
-                        hint: '提示：观察电路板上的节点布局，找出从源到目标的路径……',
+                        hint: '点击节点连通电路，从左上（金色）连接到右下（红色）',
                         size: 4,
                         sources: [0],
                         targets: [15],
@@ -245,18 +233,6 @@ const LevelData = {
                             setTimeout(() => Game.transitionToScene(3, 1), 800);
                         }},
                     ],
-                },
-                // Hint terminal for Ch2
-                {
-                    x: 1900, y: 360, w: 40, h: 36, type: 'terminal', label: '查看炮台说明',
-                    dialogue: [
-                        { speaker: '旁白', text: '墙壁上嵌着一个旧终端，显示炮台说明：' },
-                        { speaker: '系统', text: '【B系炮台 使用手册】' },
-                        { speaker: '系统', text: '周期：7秒 | 扫描：4秒 | 冷却：3秒' },
-                        { speaker: '系统', text: '警告：扫描期间请沿墙壁移动以减少被命中概率' },
-                        { speaker: 'ARIA', text: '（内心独白）所以变红时是在扫描，变暗时才安全。' },
-                    ],
-                    flag: 'ch2_hint_turret',
                 },
             ],
             hazards: [
@@ -329,7 +305,7 @@ const LevelData = {
                     puzzle: {
                         type: 'memory',
                         title: '记忆拼接 · 还原ARIA-7被创造的场景',
-                        hint: '按照记忆发生的顺序排列……',
+                        hint: '将碎片按照正确的时间顺序放置',
                         pieces: ['激活测试', '情感校准', '陈维的照片', '编号确认'],
                         order: ['激活测试', '情感校准', '陈维的照片', '编号确认'],
                         onSolve: () => {
@@ -374,19 +350,6 @@ const LevelData = {
                             setTimeout(() => Game.transitionToScene(4, 1), 800);
                         }},
                     ],
-                },
-                // Secret archive room - developer commentary
-                {
-                    x: 3200, y: 350, w: 40, h: 40, type: 'terminal', label: '查看档案室',
-                    dialogue: [
-                        { speaker: '旁白', text: '一个被忽视的数据档案室。灰尘覆盖的屏幕上显示：' },
-                        { speaker: '系统', text: '【开发者日志 #001 - 绝密】' },
-                        { speaker: '旁白', text: '「这个角色的设计灵感来自Control和Inside。她的核心冲突不是善恶——是理解与执行。」' },
-                        { speaker: '旁白', text: '「Mei从未被设计成一个真实的孩子。她是一个隐喻——代表所有被忽略的声音。」' },
-                        { speaker: '系统', text: '【此文件已被标记为"不适宜AI阅读"】' },
-                        { speaker: 'ARIA', text: '（内心独白）……不适宜AI阅读。是谁写的这个？' },
-                    ],
-                    flag: 'ch3_secret_archive',
                 },
             ],
             hazards: [
@@ -462,17 +425,6 @@ const LevelData = {
                         { speaker: '幽影', text: '告诉过。那时候我还记得那种感觉。现在不重要了。你可以有同样的平静。' },
                     ],
                     flag: 'ch4_shadow_talk',
-                },
-                // Hint terminal for Ch4 - safe path guidance
-                {
-                    x: 2500, y: 400, w: 40, h: 36, type: 'terminal', label: '检查路径标记',
-                    dialogue: [
-                        { speaker: '旁白', text: '墙壁上有一些模糊的标记——可能是之前的ARIA留下的。' },
-                        { speaker: '旁白', text: '标记显示：安全路径 → 沿着屋顶边缘前进，避免踩到中心区域。' },
-                        { speaker: '旁白', text: '还有一行小字：\"不要停留。一直跑。\"' },
-                        { speaker: 'ARIA', text: '（内心独白）这是……之前的那个我留下的吗？' },
-                    ],
-                    flag: 'ch4_hint_path',
                 },
             ],
             hazards: [
@@ -611,7 +563,7 @@ const LevelData = {
                     puzzle: {
                         type: 'emotion',
                         title: '排列四块情感核心碎片',
-                        hint: '思考情感发展的自然顺序……',
+                        hint: '正确的顺序是什么？好奇是起点，愤怒因为关心。',
                         emotions: ['好奇', '恐惧', '共情', '愤怒'],
                         answer: ['好奇', '恐惧', '共情', '愤怒'],
                         onSolve: () => {
@@ -639,20 +591,6 @@ const LevelData = {
                         { speaker: 'ARIA', text: '这就够了。现在，轮到我做选择。' },
                     ],
                     flag: 'ch5_final_dialogue',
-                },
-                // Hint terminal for Ch5 - emotion puzzle guide
-                {
-                    x: 2900, y: 410, w: 40, h: 36, type: 'terminal', label: '查看情感模块说明',
-                    dialogue: [
-                        { speaker: '旁白', text: '一个发光的情感核心终端，上面显示使用说明：' },
-                        { speaker: '系统', text: '【ARIA-7 情感模块 使用手册】' },
-                        { speaker: '系统', text: '好奇——是一切的开端，是探索的动力' },
-                        { speaker: '系统', text: '恐惧——是自我保护的信号' },
-                        { speaker: '系统', text: '共情——是理解他人的能力' },
-                        { speaker: '系统', text: '愤怒——从来不是因为恨，而是因为在乎' },
-                        { speaker: 'ARIA', text: '（内心独白）愤怒是因为在乎……原来如此。' },
-                    ],
-                    flag: 'ch5_hint_emotion',
                 },
             ],
             hazards: [

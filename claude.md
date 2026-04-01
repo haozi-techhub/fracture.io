@@ -1,202 +1,110 @@
 # CLAUDE.md
 
-本文件为 Claude Code (claude.ai/code) 在本代码库工作时提供指导。
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 项目概述
+## Project Overview
 
-**《裂缝》FRACTURE** 是一款浏览器端的叙事平台游戏，采用手绘/素描美术风格。讲述 AI ARIA-7 调查神秘北极研究站的故事。游戏包含 5 个章节、3 个结局，以及主题切换系统（完全改变视觉风格）。
+**《裂缝》FRACTURE** is a browser-based narrative platformer with hand-drawn/sketch aesthetics. It tells the story of ARIA-7, an AI investigating a mysterious arctic research station. The game features 5 chapters, 3 endings, and a theme-switching system that completely transforms the visual style.
 
-**参考游戏**: Inside, Limbo, Control, Celeste, Goose Goose Duck
+**Key reference games**: Inside, Limbo, Control, Celeste, Goose Goose Duck
 
-## 运行游戏
+## Running the Game
 
-直接在浏览器中打开 `fracture-game/index.html`，无需服务器或构建步骤。
+Open `fracture-game/index.html` directly in any modern browser. No server or build step required.
 
-## 开发调试
+## Architecture
 
-```bash
-# 语法检查所有JS文件
-node -c js/config.js && node -c js/engine.js && node -c js/game.js && node -c js/story.js && node -c js/main.js
-```
+### Stack
+- **Rendering**: HTML5 Canvas 2D (no WebGL)
+- **Audio**: Web Audio API synthesis (no external audio files)
+- **Structure**: Vanilla JS with IIFE module pattern, all state in global namespace
+- **No build step** — runs directly in browser
 
-## 架构
-
-### 技术栈
-- **渲染**: HTML5 Canvas 2D（无 WebGL）
-- **音频**: Web Audio API 合成（无外部音频文件）
-- **结构**: Vanilla JS + IIFE 模块模式，全局命名空间
-- **无需构建** — 直接在浏览器运行
-
-### 脚本加载顺序
+### Script Load Order
 `config.js` → `engine.js` → `game.js` → `story.js` → `main.js`
 
-### 核心系统
+### Core Systems
 
-**游戏状态** (`game.js`):
-```
-MENU → CHAPTER_INTRO → PLAYING → DIALOGUE → PUZZLE → CHOICE → CUTSCENE → TRANSITION → ENDING
-```
-完整枚举定义在 `config.js`:
-```javascript
-const GAME_STATES = {
-    MENU: 'menu',
-    CHAPTER_INTRO: 'chapter_intro',
-    PLAYING: 'playing',
-    DIALOGUE: 'dialogue',
-    PUZZLE: 'puzzle',
-    CHOICE: 'choice',
-    CUTSCENE: 'cutscene',
-    TRANSITION: 'transition',
-    ENDING: 'ending',
-};
-```
+**Game States** (`game.js`):
+`MENU → CHAPTER_INTRO → PLAYING → DIALOGUE → PUZZLE → CHOICE → CUTSCENE → TRANSITION → ENDING`
 
-**障碍物类型** (`story.js` 关卡数据):
-- `turret` — 第2章，周期性射击（用扫描模式查看规律）
-- `spike` — 接触即死
-- `wind` — 周期性推动玩家
-- `laser` — 开关式激光束
-- `glitch` — 伤害区域伴随画面失真
-- `projectile` — 慢速敌方射弹
-- `collapse` — 落地后 1.5 秒平台倒塌
-- `emotion_storm` — 第5章，推动玩家
-- `shadow_minion` — 第4章追逐中生成
+**Renderer** (`engine.js`): Canvas context, character drawing (Goose Goose Duck style — fat bean bodies, tiny legs, thick outlines), platform drawing, particle system, background layers with parallax per chapter. Uses theme routing via `_getTheme()` to dispatch to theme-specific drawing functions.
 
-**作弊码** (`engine.js` + `game.js`):
-在标题画面通过 `Input._cheatBuffer` 输入:
-| 名称 | 按键 | 效果 |
-|------|------|------|
-| Konami | ↑↑↓↓←→←→ BA | 解锁全部结局 |
-| IDDQD | ↑↓←→ ABAB | 无敌模式开关 |
-| Showpeed | ←←▼▼ | 加速模式开关 |
+**Input** (`engine.js`): Keyboard + mouse + touch (mobile joystick). Exposes: `Input.left/right/jump/interact/roll/scan/enter`
 
-**秘密发现系统** (`game.js`):
-- `Game._secretsFound` — 已发现秘密/提示计数
-- `Game._allSecretsFound` — 发现5个以上秘密时为 true（触发隐藏结局 D 提示）
-- `Game._totalDeaths` — 死亡次数；每死亡5次 ARIA 会评论
-- `Game._platformDeaths` — 每个平台的死亡次数（3次以上显示 RIP 标记）
+**Audio** (`engine.js`): Web Audio synthesis only — no external audio files. Functions: `playJump()`, `playLand()`, `playDialogue()`, `playSILO()`, `playPuzzleSolve()`, `playEndingA/B/C()`, etc.
 
-**渲染器** (`engine.js`): Canvas 上下文，角色绘制（鹅鸭杀风格 — 圆润身材、小短腿、粗轮廓），平台绘制，粒子系统，每章视差背景。通过 `_getTheme()` 路由到主题特定的绘制函数。
+**Theme System** (`config.js` + `engine.js`):
+- `THEMES` enum: `DOODLE`, `GGG`, `RDR`, `PIXEL`
+- `THEME_DEFS` object contains per-theme: `character` (bodyShape, eyeScale, legStyle, etc.), `platform` (edgeStyle, roughness), `background` (paperTexture, scanLines, vignetteStyle), `particles` (shape, dustColor), `palette` (all colors), `chapters` (ch1-ch5 color overrides), `cssClass`
+- `getCurrentTheme()` returns current theme definition
+- `setTheme(themeId)` switches theme and updates CSS class on game container
+- `Renderer._getTheme()` caches current theme; `invalidateThemeCache()` refreshes
 
-**输入** (`engine.js`): 键盘 + 鼠标 + 触控（移动端虚拟摇杆）。暴露: `Input.left/right/jump/interact/roll/scan/enter`
-
-**音频** (`engine.js`): 纯 Web Audio API 合成。函数: `playJump()`, `playLand()`, `playDialogue()`, `playSILO()`, `playPuzzleSolve()`, `playEndingA/B/C()` 等。
-- `Audio.setMasterVolume(v)` — 设置音效音量 (0-1)
-- `Audio.setMusicVolume(v)` — 设置BGM音量 (0-1)
-
-**设置系统** (`main.js` `initHUDSettings()`):
-- 游戏内设置面板 (`#settings-overlay`) — 音效/音乐音量滑块、帧率显示开关
-- 退出确认对话框 (`#exit-confirm`) — 防止误触返回主菜单
-- HUD右上角 ⚙设置 和 ✕退出 按钮
-- `quitToMenu()` — 停止音频、重置状态、恢复标题画面
-
-**玩家物理** (`game.js`):
-- 多段跳系统: `CONFIG.PLAYER_MAX_JUMPS`（默认3）, `CONFIG.PLAYER_AIR_JUMP_VELOCITY`
-- 跳跃缓冲: `CONFIG.PLAYER_JUMP_BUFFER_TIME`（帧）
-- 翻滚: `CONFIG.ROLL_DURATION` + `CONFIG.ROLL_COOLDOWN`，期间无敌帧
-- 碰撞: `CONFIG.PLATFORM_TOLERANCE`（落地判定比视觉宽度宽20%）
-
-**背景系统** (`engine.js`): 每章视差层定义在关卡数据中（`story.js`）。每层有 `depth`（0-1，越小越远）、`color`、`shapes[]`。使用 `_drawBgLayer_parallax()` 及各主题样式变体。
-
-**主题系统** (`config.js` + `engine.js`):
-- `THEMES` 枚举: `DOODLE`, `GGG`, `RDR`, `PIXEL`
-- `THEME_DEFS` 对象包含每主题: `character`（bodyShape, eyeScale, legStyle 等）, `platform`（edgeStyle, roughness）, `background`（paperTexture, scanLines, vignetteStyle）, `particles`（shape, dustColor）, `palette`, `chapters`（ch1-ch5 颜色覆盖）, `cssClass`
-- `getCurrentTheme()` 返回当前主题定义
-- `setTheme(themeId)` 切换主题并更新容器 CSS 类
-- `Renderer._getTheme()` 缓存当前主题；`invalidateThemeCache()` 刷新
-
-### 文件结构
+### File Structure
 
 ```
 fracture-game/
-├── index.html          # HTML结构，所有UI覆盖层，加载脚本
-├── css/style.css       # 样式（含主题特定CSS覆盖）
-├── WALKTHROUGH.md      # 外部攻略文档
+├── index.html          # HTML structure, all UI overlays, loads scripts
+├── css/style.css       # Styles (includes theme-specific CSS overrides)
 └── js/
-    ├── config.js        # CONFIG, MORANDI调色板, GAME_STATES, PORTRAIT_COLORS, THEMES, THEME_DEFS
-    ├── engine.js        # Input, Audio, Renderer（核心绘图辅助）
-    ├── game.js          # 游戏状态机, Player, World, Dialogue, Puzzle, Choice系统
-    ├── story.js         # LevelData（5章关卡）+ StoryData（结局）
-    └── main.js          # 入口点, 游戏循环, 标题画面动画, 电影引擎, HUD设置
+    ├── config.js        # CONFIG, MORANDI palette, GAME_STATES, PORTRAIT_COLORS, THEMES, THEME_DEFS
+    ├── engine.js        # Input, Audio, Renderer (core drawing helpers)
+    ├── game.js          # Game state machine, Player, World, Dialogue, Puzzle, Choice systems
+    ├── story.js         # LevelData (all 5 chapters) + StoryData (endings)
+    └── main.js          # Entry point, game loop, title screen animation, cinematic engine
 ```
 
-### HTML覆盖层结构
-- `#title-screen` — 标题画面（包含电影开场动画）
-- `#settings-overlay` — 设置面板（音量、帧率）
-- `#exit-confirm` — 退出确认对话框
-- `#hud` — 游戏中的抬头显示（章节信息、设置/退出按钮）
-- `#dialogue-box` — 对话框
-- `#puzzle-overlay` — 谜题界面
-- `#choice-panel` — 选项界面
-- `#chapter-card` — 章节标题卡
+### Character Visuals
 
-### 角色视觉
+All characters drawn as "fat bean" shapes with tiny stubby legs, big eyes, beak, blush marks. Defined in `PORTRAIT_COLORS` (config.js) — each character has: `body, eye, beak, feet, hat` colors.
 
-所有角色绘制为"圆润豆子"形状，小短腿，大眼睛，喙，腮红标记。定义在 `PORTRAIT_COLORS`（config.js）— 每个角色有: `body, eye, beak, feet, hat` 颜色。
+Character definitions for the cinematic title screen are in `main.js` (`charARIA`, `charChen`, `charSILO`, `charShadow`).
 
-电影式标题画面的角色定义在 `main.js`（`charARIA`, `charChen`, `charSILO`, `charShadow`）。
+### Controls
+- **Desktop**: Arrow keys / WASD move, Space/W jump, Shift roll, E interact, Q scan mode (Ch2+), Enter continue dialogue
+- **Mobile**: Virtual joystick + buttons (auto-shown on touch devices)
 
-### 操作方式
-- **桌面端**: 方向键 / WASD 移动，空格/W 跳跃，Shift 翻滚，E 交互，Q 扫描模式（第2章后），Enter 继续对话
-- **移动端**: 虚拟摇杆 + 按钮（触屏设备自动显示）
+### Canvas Resolution
+1280×720 (CONFIG.CANVAS_W/CANVAS_H), auto-scales to viewport while maintaining aspect ratio.
 
-### CSS overlay 注意事项
-`.overlay` 基类有 `opacity: 0` 和 `pointer-events: none`，需要添加 `.active` 类或使用 `!important` 覆盖才能显示。自定义覆盖层（如 `#settings-overlay`）需要在CSS中显式设置 `display: flex !important`、`opacity: 1` 和 `pointer-events: auto`。
+## Theme System Architecture
 
-### 画布分辨率
-1280×720（CONFIG.CANVAS_W/CANVAS_H），自动缩放适应窗口保持宽高比。
+Each theme (`THEME_DEFS[key]`) contains:
 
-## 主题系统架构
-
-每个主题（`THEME_DEFS[key]`）包含:
-
-| 属性 | 用途 |
-|------|------|
-| `character.bodyShape` | 路由到 `drawCharacter_*` 方法: `angular`（Doodle）, `bean`（GGG）, `cowboy`（RDR）, `pixelated`（Pixel） |
-| `character.eyeScale` | 眼睛大小倍数（GGG 为 1.4, RDR 为 0.85） |
+| Property | Purpose |
+|----------|---------|
+| `character.bodyShape` | Routed in `drawCharacter_*` methods: `angular` (Doodle), `bean` (GGG), `cowboy` (RDR), `pixelated` (Pixel) |
+| `character.eyeScale` | Eye size multiplier (1.4 for GGG, 0.85 for RDR) |
 | `character.legStyle` | `stick`, `tiny`, `thick`, `pixel` |
-| `platform.edgeStyle` | `sketchy`（Doodle/GGG）, `rough`（RDR）, `pixelated`（Pixel） |
-| `background.usePaperTexture` | `true` 纸纹背景，`false` 纯色+扫描线 |
-| `background.scanLines` | Pixel 主题 CRT 扫描线效果 |
-| `particles.shape` | `circle`（默认）, `pixel`（Pixel） |
-| `palette` | 完整颜色集: `bg, sky, accent, gold, ink, paper, danger` 等 |
-| `chapters` | 每章颜色覆盖（`ch1` 到 `ch5`） |
-| `cssClass` | 添加到 `#game-container` 的 CSS 类 |
+| `platform.edgeStyle` | `sketchy` (Doodle/GGG), `rough` (RDR), `pixelated` (Pixel) |
+| `background.usePaperTexture` | `true` for paper texture, `false` for solid + scanlines |
+| `background.scanLines` | CRT scanline effect for Pixel theme |
+| `particles.shape` | `circle` (default), `pixel` (Pixel) |
+| `palette` | Full color set: `bg, sky, accent, gold, ink, paper, danger, etc.` |
+| `chapters` | Per-chapter color overrides (`ch1` through `ch5`) |
+| `cssClass` | CSS class added to `#game-container` for theme-specific UI styling |
 
-主题切换应用 CSS 类到容器，Renderer 缓存主题颜色。engine.js 中的 `_hexToRgba()` 工具函数将主题颜色转换为 rgba 字符串。
+Theme switching applies CSS classes to the container and the Renderer caches theme colors. The `_hexToRgba()` utility in engine.js converts theme hex colors to rgba strings.
 
-## 常见开发任务
+## Common Development Tasks
 
-### 添加新章节
-1. 在 `story.js` 的 `LevelData.levels` 下添加关卡数据，key 为 `chX_sY`
-2. 定义 platforms, interactables（含对话/谜题）, hazards, triggers, decorations
-3. 如需新调色板，在 `config.js` 的 `MORANDI` 中添加
+### Adding a new chapter
+1. Add level data to `story.js` under `LevelData.levels` with key `chX_sY`
+2. Define platforms, interactables (with dialogue/puzzles), hazards, triggers, decorations
+3. Add chapter color palette to `MORANDI` in `config.js` if needed
 
-### 添加新谜题类型
-1. 在 `Game` 类（`game.js`）中添加渲染方法: `_renderXxxPuzzle()`
-2. 在 `startPuzzle()` 中根据 `puzzleConfig.type` 调用
-3. 添加解答逻辑并调用 `solvePuzzle()` 完成
+### Adding a new puzzle type
+1. Add render method in `Game` class (`game.js`): `_renderXxxPuzzle()`
+2. Call it from `startPuzzle()` based on `puzzleConfig.type`
+3. Add solve logic and call `solvePuzzle()` when complete
 
-### 添加新交互类型
-1. 在 `Renderer.drawInteractable()`（`engine.js`）中添加绘制代码
-2. 在 `triggerInteraction()`（`game.js`）中添加触发逻辑
+### Adding a new interactable type
+1. Add drawing code in `Renderer.drawInteractable()` (`engine.js`)
+2. Add trigger logic in `triggerInteraction()` in `game.js`
 
-### 添加新主题
-1. 在 `config.js` 的 `THEMES` 枚举和 `THEME_DEFS` 对象中添加条目
-2. 在 `style.css` 中添加 CSS 覆盖（如 `.theme-newtheme #dialogue-box`）
-3. 如主题有独特角色身形，在 engine.js 添加 `drawCharacter_newshape()` 方法
-4. 如主题有独特背景层样式，在 engine.js 添加 `_drawBgLayer_newstyle()` 方法
-
-### 添加提示终端（游戏内可发现指南）
-在 `story.js` 关卡数据中放置 `type: 'terminal'` 且 `flag` 包含 'hint' 或 'secret' 的交互物。标记由 `Game.flags[]` 追踪并计入 `Game._secretsFound`。
-
-### WALKTHROUGH 系统
-内置游戏指南在 `config.js` 的 `WALKTHROUGH` 常量中，提供每章:
-- `name`, `password`, `passwordHint`
-- `secrets[]` — 隐藏发现物
-- `tips[]` — 游戏提示
-- `circuitSolution` — 第2章电路谜题答案
-- `memoryOrder` — 第3章记忆谜题顺序
-- `emotionOrder` — 第5章情感谜题顺序
-
-外部攻略: 项目根目录的 `WALKTHROUGH.md`。
+### Adding a new theme
+1. Add entry to `THEMES` enum and `THEME_DEFS` object in `config.js`
+2. Add CSS overrides in `style.css` (e.g., `.theme-newtheme #dialogue-box`)
+3. If theme has unique character body shape, add `drawCharacter_newshape()` method in engine.js
+4. If theme has unique background layer style, add `_drawBgLayer_newstyle()` method in engine.js

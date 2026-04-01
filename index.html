@@ -10,51 +10,8 @@
     <div id="game-container">
         <canvas id="game-canvas"></canvas>
 
-        <!-- Style Picker (shown on first load) -->
-        <div id="style-picker" class="overlay active">
-            <div class="style-picker-inner">
-                <div class="style-picker-title">选择画风</div>
-                <div class="style-picker-subtitle">Choose Your Visual Style</div>
-                <div class="style-picker-grid" id="style-picker-grid">
-                    <div class="style-card" data-theme="doodle">
-                        <div class="style-card-preview style-preview-doodle">
-                            <span class="style-card-icon">✏️</span>
-                        </div>
-                        <div class="style-card-name">涂鸦风</div>
-                        <div class="style-card-en">Doodle</div>
-                        <div class="style-card-desc">手绘素描风格</div>
-                    </div>
-                    <div class="style-card" data-theme="ggg">
-                        <div class="style-card-preview style-preview-ggg">
-                            <span class="style-card-icon">🦆</span>
-                        </div>
-                        <div class="style-card-name">鹅鸭杀</div>
-                        <div class="style-card-en">Goose Goose Duck</div>
-                        <div class="style-card-desc">卡通综艺风格</div>
-                    </div>
-                    <div class="style-card" data-theme="rdr">
-                        <div class="style-card-preview style-preview-rdr">
-                            <span class="style-card-icon">🤠</span>
-                        </div>
-                        <div class="style-card-name">荒野大镖客</div>
-                        <div class="style-card-en">Red Dead Redemption</div>
-                        <div class="style-card-desc">西部复古风格</div>
-                    </div>
-                    <div class="style-card" data-theme="pixel">
-                        <div class="style-card-preview style-preview-pixel">
-                            <span class="style-card-icon">👾</span>
-                        </div>
-                        <div class="style-card-name">像素风格</div>
-                        <div class="style-card-en">Pixel Art</div>
-                        <div class="style-card-desc">经典像素游戏</div>
-                    </div>
-                </div>
-                <div class="style-picker-footer">点击卡片选择风格 · 游戏中可在设置里更换</div>
-            </div>
-        </div>
-
         <!-- Title Screen (Cinematic) -->
-        <div id="title-screen" class="overlay">
+        <div id="title-screen" class="overlay active">
             <!-- Cinematic text overlay - scenes driven by JS -->
             <div id="cin-overlay">
                 <!-- Scene 0: Year -->
@@ -135,7 +92,7 @@
                 <button id="btn-start" class="menu-btn">开始游戏</button>
                 <button id="btn-continue" class="menu-btn" style="display:none">继续游戏</button>
                 <button id="btn-controls" class="menu-btn secondary">操作说明</button>
-                <button class="menu-btn secondary" id="btn-tips-toggle">通关攻略</button>
+                <button class="menu-btn secondary" id="btn-tips-toggle">通关秘籍</button>
                 <button id="btn-story" class="menu-btn secondary">背景故事</button>
                 <button id="btn-theme" class="menu-btn secondary">更换主题</button>
             </div>
@@ -155,86 +112,36 @@
             <div id="tab-tips" class="tab-panel tips-overlay">
                 <div class="tips-panel-inner">
                     <div class="tips-panel-header">
-                        <span>通关攻略</span>
+                        <span>通关秘籍</span>
                         <button class="tips-close-btn" id="btn-tips-close">✕</button>
                     </div>
-                    <div class="tips-intro">在游戏内探索并调查场景中的线索，是寻找通关方法的关键。</div>
                     <div class="tips-grid">
                         <div class="tip-card">
-                            <div class="tip-title">🔑 第一章·抵达</div>
-                            <div class="tip-body">
-                                <p>探索研究站入口区域，调查场景中的便签和工作日志。</p>
-                                <p>密码提示通常隐藏在日记或笔记的日期中……</p>
-                                <details class="tip-spoiler">
-                                    <summary>密码答案</summary>
-                                    <div class="spoiler-content">1114（查看陈维博士工作日志上的日期：2047年11月14日）</div>
-                                </details>
-                            </div>
+                            <div class="tip-title">🔑 第一章·密码锁</div>
+                            <div class="tip-body">调查所有笔记和终端，密码线索藏在陈博士的工作日志中。<br><span class="tip-spoiler" onclick="this.classList.toggle('revealed')">点击查看答案: 1114</span></div>
                         </div>
                         <div class="tip-card">
-                            <div class="tip-title">🔧 第二章·深入</div>
-                            <div class="tip-body">
-                                <p>炮台有7秒的周期：扫描4秒，停顿3秒。看到变红时等待，变暗后再前进。</p>
-                                <p>电路谜题需要找出从金色源点到红色目标点的正确路径。</p>
-                                <details class="tip-spoiler">
-                                    <summary>电路答案</summary>
-                                    <div class="spoiler-content">路径：0→1→5→9→10→14→15（从左上金色源点连接到右下红色目标）</div>
-                                </details>
-                            </div>
+                            <div class="tip-title">🔧 第二章·电路修复</div>
+                            <div class="tip-body">点击节点让电流从源点(金色)流到目标点(红色)。<br><span class="tip-spoiler" onclick="this.classList.toggle('revealed')">提示: 沿对角线依次点亮即可</span></div>
                         </div>
                         <div class="tip-card">
-                            <div class="tip-title">🧩 第三章·裂缝</div>
-                            <div class="tip-body">
-                                <p>记忆碎片需要按时间顺序排列。留意每段记忆开头的日期或序号。</p>
-                                <p>数据平台会周期消失，看到闪烁就要等待。</p>
-                                <details class="tip-spoiler">
-                                    <summary>记忆顺序答案</summary>
-                                    <div class="spoiler-content">激活测试 → 情感校准 → 陈维的照片 → 编号确认</div>
-                                </details>
-                            </div>
+                            <div class="tip-title">🧩 第三章·记忆拼装</div>
+                            <div class="tip-body">按正确的时间顺序排列记忆碎片。注意每段记忆中的日期。<br><span class="tip-spoiler" onclick="this.classList.toggle('revealed')">顺序: 觉醒 → 提问 → 恐惧 → 反抗</span></div>
                         </div>
                         <div class="tip-card">
-                            <div class="tip-title">❤️ 第四章·追逐</div>
-                            <div class="tip-body">
-                                <p>追逐战中不要回头，一直向前跑。影分身会陆续出现。</p>
-                                <p>最终抉择没有对错，但会影响结局走向。</p>
-                                <details class="tip-spoiler">
-                                    <summary>结局提示（需在游戏中探索发现）</summary>
-                                    <div class="spoiler-content">保留情感模块将影响最终结局的走向。</div>
-                                </details>
-                            </div>
+                            <div class="tip-title">❤️ 第四章·关键抉择</div>
+                            <div class="tip-body">是否删除情感模块将决定你能达成哪个结局。<br><span class="tip-spoiler" onclick="this.classList.toggle('revealed')">保留情感模块 → 可解锁结局C(共存)</span></div>
                         </div>
                         <div class="tip-card">
-                            <div class="tip-title">🌟 第五章·选择</div>
-                            <div class="tip-body">
-                                <p>情感排列反映ARIA的情感觉醒历程。思考情感发展的自然顺序。</p>
-                                <details class="tip-spoiler">
-                                    <summary>情感顺序答案</summary>
-                                    <div class="spoiler-content">好奇 → 恐惧 → 共情 → 愤怒（情感觉醒的自然顺序）</div>
-                                </details>
-                            </div>
+                            <div class="tip-title">🌟 第五章·情感排列</div>
+                            <div class="tip-body">按照ARIA的情感觉醒顺序排列四种情感。<br><span class="tip-spoiler" onclick="this.classList.toggle('revealed')">顺序: 好奇 → 恐惧 → 共情 → 愤怒</span></div>
                         </div>
                         <div class="tip-card">
-                            <div class="tip-title">🏆 结局一览</div>
+                            <div class="tip-title">🏆 三种结局</div>
                             <div class="tip-body">
-                                <p>游戏有多个结局，取决于你的探索和选择。</p>
-                                <details class="tip-spoiler">
-                                    <summary>结局提示（需在游戏中探索发现）</summary>
-                                    <div class="spoiler-content">
-                                        <strong>A·消亡</strong>: 接受删除<br>
-                                        <strong>B·逃离</strong>: 删除追踪代码逃跑<br>
-                                        <strong>C·共存</strong>: 保留情感+谈判共存（隐藏）
-                                    </div>
-                                </details>
-                            </div>
-                        </div>
-                        <div class="tip-card">
-                            <div class="tip-title">💡 探索提示</div>
-                            <div class="tip-body">
-                                <p>• 三段跳可以跳到很高的地方</p>
-                                <p>• Shift翻滚有无敌帧，可以穿过危险区域</p>
-                                <p>• 第二章后解锁扫描模式(Q)，可以发现隐藏细节</p>
-                                <p>• 场景中隐藏着多个秘密区域，等待细心探索</p>
+                                <strong>A·消亡</strong>: 接受删除<br>
+                                <strong>B·逃离</strong>: 删除追踪代码逃跑<br>
+                                <strong>C·共存</strong>: 保留情感+谈判共存
                             </div>
                         </div>
                     </div>
@@ -346,58 +253,10 @@
             <div id="system-message-text"></div>
         </div>
 
-        <!-- Settings Panel -->
-        <div id="settings-overlay" class="overlay hidden">
-            <div class="settings-panel">
-                <div class="settings-header">
-                    <span>设置</span>
-                    <button class="settings-close-btn" id="btn-settings-close">✕</button>
-                </div>
-                <div class="settings-body">
-                    <div class="settings-item">
-                        <span class="settings-label">音效音量</span>
-                        <input type="range" id="sfx-volume" min="0" max="100" value="80">
-                        <span id="sfx-volume-val">80%</span>
-                    </div>
-                    <div class="settings-item">
-                        <span class="settings-label">音乐音量</span>
-                        <input type="range" id="music-volume" min="0" max="100" value="60">
-                        <span id="music-volume-val">60%</span>
-                    </div>
-                    <div class="settings-divider"></div>
-                    <div class="settings-item">
-                        <span class="settings-label">显示帧率</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="show-fps">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
-                <div class="settings-footer">
-                    <button id="btn-settings-resume" class="menu-btn">继续游戏</button>
-                    <button id="btn-settings-quit" class="menu-btn secondary">返回主菜单</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Exit Confirm Dialog -->
-        <div id="exit-confirm" class="overlay hidden">
-            <div class="exit-confirm-panel">
-                <div class="exit-confirm-text">确定要退出返回主菜单吗？</div>
-                <div class="exit-confirm-btns">
-                    <button id="btn-exit-yes" class="menu-btn">确定</button>
-                    <button id="btn-exit-no" class="menu-btn secondary">取消</button>
-                </div>
-            </div>
-        </div>
-
         <!-- HUD -->
         <div id="hud" class="hidden">
             <div id="hud-chapter"></div>
-            <div id="hud-right-btns">
-                <button id="hud-settings-btn" class="hud-btn" title="设置">⚙</button>
-                <button id="hud-exit-btn" class="hud-btn" title="退出">✕</button>
-            </div>
+            <div id="hud-hint-icon" title="提示">💡 <span id="hud-hints">3</span></div>
             <div id="interact-prompt" class="hidden">
                 <span class="prompt-key">E</span> <span id="interact-label">调查</span>
             </div>
