@@ -12,6 +12,13 @@
 
 直接在浏览器中打开 `fracture-game/index.html`，无需服务器或构建步骤。
 
+## 开发调试
+
+```bash
+# 语法检查所有JS文件
+node -c js/config.js && node -c js/engine.js && node -c js/game.js && node -c js/story.js && node -c js/main.js
+```
+
 ## 架构
 
 ### 技术栈
@@ -74,6 +81,14 @@ const GAME_STATES = {
 **输入** (`engine.js`): 键盘 + 鼠标 + 触控（移动端虚拟摇杆）。暴露: `Input.left/right/jump/interact/roll/scan/enter`
 
 **音频** (`engine.js`): 纯 Web Audio API 合成。函数: `playJump()`, `playLand()`, `playDialogue()`, `playSILO()`, `playPuzzleSolve()`, `playEndingA/B/C()` 等。
+- `Audio.setMasterVolume(v)` — 设置音效音量 (0-1)
+- `Audio.setMusicVolume(v)` — 设置BGM音量 (0-1)
+
+**设置系统** (`main.js` `initHUDSettings()`):
+- 游戏内设置面板 (`#settings-overlay`) — 音效/音乐音量滑块、帧率显示开关
+- 退出确认对话框 (`#exit-confirm`) — 防止误触返回主菜单
+- HUD右上角 ⚙设置 和 ✕退出 按钮
+- `quitToMenu()` — 停止音频、重置状态、恢复标题画面
 
 **玩家物理** (`game.js`):
 - 多段跳系统: `CONFIG.PLAYER_MAX_JUMPS`（默认3）, `CONFIG.PLAYER_AIR_JUMP_VELOCITY`
@@ -96,13 +111,24 @@ const GAME_STATES = {
 fracture-game/
 ├── index.html          # HTML结构，所有UI覆盖层，加载脚本
 ├── css/style.css       # 样式（含主题特定CSS覆盖）
+├── WALKTHROUGH.md      # 外部攻略文档
 └── js/
     ├── config.js        # CONFIG, MORANDI调色板, GAME_STATES, PORTRAIT_COLORS, THEMES, THEME_DEFS
     ├── engine.js        # Input, Audio, Renderer（核心绘图辅助）
     ├── game.js          # 游戏状态机, Player, World, Dialogue, Puzzle, Choice系统
     ├── story.js         # LevelData（5章关卡）+ StoryData（结局）
-    └── main.js          # 入口点, 游戏循环, 标题画面动画, 电影引擎
+    └── main.js          # 入口点, 游戏循环, 标题画面动画, 电影引擎, HUD设置
 ```
+
+### HTML覆盖层结构
+- `#title-screen` — 标题画面（包含电影开场动画）
+- `#settings-overlay` — 设置面板（音量、帧率）
+- `#exit-confirm` — 退出确认对话框
+- `#hud` — 游戏中的抬头显示（章节信息、设置/退出按钮）
+- `#dialogue-box` — 对话框
+- `#puzzle-overlay` — 谜题界面
+- `#choice-panel` — 选项界面
+- `#chapter-card` — 章节标题卡
 
 ### 角色视觉
 
@@ -113,6 +139,9 @@ fracture-game/
 ### 操作方式
 - **桌面端**: 方向键 / WASD 移动，空格/W 跳跃，Shift 翻滚，E 交互，Q 扫描模式（第2章后），Enter 继续对话
 - **移动端**: 虚拟摇杆 + 按钮（触屏设备自动显示）
+
+### CSS overlay 注意事项
+`.overlay` 基类有 `opacity: 0` 和 `pointer-events: none`，需要添加 `.active` 类或使用 `!important` 覆盖才能显示。自定义覆盖层（如 `#settings-overlay`）需要在CSS中显式设置 `display: flex !important`、`opacity: 1` 和 `pointer-events: auto`。
 
 ### 画布分辨率
 1280×720（CONFIG.CANVAS_W/CANVAS_H），自动缩放适应窗口保持宽高比。

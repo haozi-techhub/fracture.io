@@ -1913,12 +1913,17 @@ body {
 #style-picker {
     background: #120E08;
     z-index: 300;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
 }
 #style-picker:not(.active) {
     display: none !important;
+    visibility: hidden !important;
+}
+#style-picker.hidden {
+    display: none !important;
+    visibility: hidden !important;
 }
 .style-picker-inner {
     text-align: center;

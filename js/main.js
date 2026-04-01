@@ -1153,6 +1153,7 @@
         const savedTheme = localStorage.getItem('fracture_theme');
         if (savedTheme && THEME_DEFS[savedTheme]) {
             picker.classList.remove('active');
+            picker.classList.add('hidden');
             startAfterStylePick();
             return;
         }
@@ -1180,6 +1181,7 @@
                     picker.style.opacity = '0';
                     setTimeout(() => {
                         picker.classList.remove('active');
+                        picker.classList.add('hidden');
                         picker.style.opacity = '';
                         picker.style.transition = '';
                         startAfterStylePick();
