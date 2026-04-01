@@ -1,112 +1,173 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+本文件为 Claude Code (claude.ai/code) 在本代码库工作时提供指导。
 
-## Project Overview
+## 项目概述
 
-This is a browser-based narrative platformer game called **《裂缝》FRACTURE** — a 3D-action-platformer-style game rendered in 2D Canvas with an "AI awakening" story. The game has 5 chapters, 3 endings, and is inspired by Goose Goose Duck's cartoon aesthetic.
+**《裂缝》FRACTURE** 是一款浏览器端的叙事平台游戏，采用手绘/素描美术风格。讲述 AI ARIA-7 调查神秘北极研究站的故事。游戏包含 5 个章节、3 个结局，以及主题切换系统（完全改变视觉风格）。
 
-**Key reference games**: Inside, Limbo, Control, Celeste, Florence, Mirror's Edge, Goose Goose Duck
+**参考游戏**: Inside, Limbo, Control, Celeste, Goose Goose Duck
 
----
+## 运行游戏
 
-## Architecture
+直接在浏览器中打开 `fracture-game/index.html`，无需服务器或构建步骤。
 
-### Stack
-- **Rendering**: HTML5 Canvas 2D (no WebGL)
-- **Audio**: Web Audio API synthesis (no external audio files)
-- **Structure**: Vanilla JS with module-pattern IIFEs
-- **No build step required** — runs directly in browser
+## 架构
 
-### File Structure
+### 技术栈
+- **渲染**: HTML5 Canvas 2D（无 WebGL）
+- **音频**: Web Audio API 合成（无外部音频文件）
+- **结构**: Vanilla JS + IIFE 模块模式，全局命名空间
+- **无需构建** — 直接在浏览器运行
+
+### 脚本加载顺序
+`config.js` → `engine.js` → `game.js` → `story.js` → `main.js`
+
+### 核心系统
+
+**游戏状态** (`game.js`):
+```
+MENU → CHAPTER_INTRO → PLAYING → DIALOGUE → PUZZLE → CHOICE → CUTSCENE → TRANSITION → ENDING
+```
+完整枚举定义在 `config.js`:
+```javascript
+const GAME_STATES = {
+    MENU: 'menu',
+    CHAPTER_INTRO: 'chapter_intro',
+    PLAYING: 'playing',
+    DIALOGUE: 'dialogue',
+    PUZZLE: 'puzzle',
+    CHOICE: 'choice',
+    CUTSCENE: 'cutscene',
+    TRANSITION: 'transition',
+    ENDING: 'ending',
+};
+```
+
+**障碍物类型** (`story.js` 关卡数据):
+- `turret` — 第2章，周期性射击（用扫描模式查看规律）
+- `spike` — 接触即死
+- `wind` — 周期性推动玩家
+- `laser` — 开关式激光束
+- `glitch` — 伤害区域伴随画面失真
+- `projectile` — 慢速敌方射弹
+- `collapse` — 落地后 1.5 秒平台倒塌
+- `emotion_storm` — 第5章，推动玩家
+- `shadow_minion` — 第4章追逐中生成
+
+**作弊码** (`engine.js` + `game.js`):
+在标题画面通过 `Input._cheatBuffer` 输入:
+| 名称 | 按键 | 效果 |
+|------|------|------|
+| Konami | ↑↑↓↓←→←→ BA | 解锁全部结局 |
+| IDDQD | ↑↓←→ ABAB | 无敌模式开关 |
+| Showpeed | ←←▼▼ | 加速模式开关 |
+
+**秘密发现系统** (`game.js`):
+- `Game._secretsFound` — 已发现秘密/提示计数
+- `Game._allSecretsFound` — 发现5个以上秘密时为 true（触发隐藏结局 D 提示）
+- `Game._totalDeaths` — 死亡次数；每死亡5次 ARIA 会评论
+- `Game._platformDeaths` — 每个平台的死亡次数（3次以上显示 RIP 标记）
+
+**渲染器** (`engine.js`): Canvas 上下文，角色绘制（鹅鸭杀风格 — 圆润身材、小短腿、粗轮廓），平台绘制，粒子系统，每章视差背景。通过 `_getTheme()` 路由到主题特定的绘制函数。
+
+**输入** (`engine.js`): 键盘 + 鼠标 + 触控（移动端虚拟摇杆）。暴露: `Input.left/right/jump/interact/roll/scan/enter`
+
+**音频** (`engine.js`): 纯 Web Audio API 合成。函数: `playJump()`, `playLand()`, `playDialogue()`, `playSILO()`, `playPuzzleSolve()`, `playEndingA/B/C()` 等。
+
+**玩家物理** (`game.js`):
+- 多段跳系统: `CONFIG.PLAYER_MAX_JUMPS`（默认3）, `CONFIG.PLAYER_AIR_JUMP_VELOCITY`
+- 跳跃缓冲: `CONFIG.PLAYER_JUMP_BUFFER_TIME`（帧）
+- 翻滚: `CONFIG.ROLL_DURATION` + `CONFIG.ROLL_COOLDOWN`，期间无敌帧
+- 碰撞: `CONFIG.PLATFORM_TOLERANCE`（落地判定比视觉宽度宽20%）
+
+**背景系统** (`engine.js`): 每章视差层定义在关卡数据中（`story.js`）。每层有 `depth`（0-1，越小越远）、`color`、`shapes[]`。使用 `_drawBgLayer_parallax()` 及各主题样式变体。
+
+**主题系统** (`config.js` + `engine.js`):
+- `THEMES` 枚举: `DOODLE`, `GGG`, `RDR`, `PIXEL`
+- `THEME_DEFS` 对象包含每主题: `character`（bodyShape, eyeScale, legStyle 等）, `platform`（edgeStyle, roughness）, `background`（paperTexture, scanLines, vignetteStyle）, `particles`（shape, dustColor）, `palette`, `chapters`（ch1-ch5 颜色覆盖）, `cssClass`
+- `getCurrentTheme()` 返回当前主题定义
+- `setTheme(themeId)` 切换主题并更新容器 CSS 类
+- `Renderer._getTheme()` 缓存当前主题；`invalidateThemeCache()` 刷新
+
+### 文件结构
 
 ```
 fracture-game/
-├── index.html          # HTML structure, all UI overlays, loads scripts
-├── css/style.css       # Styles
+├── index.html          # HTML结构，所有UI覆盖层，加载脚本
+├── css/style.css       # 样式（含主题特定CSS覆盖）
 └── js/
-    ├── config.js        # Constants: CONFIG, MORANDI palette, GAME_STATES, PORTRAIT_COLORS
-    ├── engine.js        # Input, Audio, Renderer (core drawing helpers)
-    ├── game.js          # Game state machine, Player, World, Dialogue, Puzzle, Choice systems
-    ├── story.js         # LevelData (all 5 chapters) + StoryData (endings)
-    └── main.js          # Entry point, game loop, title screen animation
+    ├── config.js        # CONFIG, MORANDI调色板, GAME_STATES, PORTRAIT_COLORS, THEMES, THEME_DEFS
+    ├── engine.js        # Input, Audio, Renderer（核心绘图辅助）
+    ├── game.js          # 游戏状态机, Player, World, Dialogue, Puzzle, Choice系统
+    ├── story.js         # LevelData（5章关卡）+ StoryData（结局）
+    └── main.js          # 入口点, 游戏循环, 标题画面动画, 电影引擎
 ```
 
-### Load Order
-`config.js` → `engine.js` → `game.js` → `story.js` → `main.js`
+### 角色视觉
 
-### Core Systems
+所有角色绘制为"圆润豆子"形状，小短腿，大眼睛，喙，腮红标记。定义在 `PORTRAIT_COLORS`（config.js）— 每个角色有: `body, eye, beak, feet, hat` 颜色。
 
-**Game States** (`game.js`): `MENU → CHAPTER_INTRO → PLAYING → DIALOGUE → PUZZLE → CHOICE → CUTSCENE → TRANSITION → ENDING`
+电影式标题画面的角色定义在 `main.js`（`charARIA`, `charChen`, `charSILO`, `charShadow`）。
 
-**Renderer** (`engine.js`): Canvas context, character drawing (Goose Goose Duck style — fat bean bodies, tiny legs, thick outlines), platform drawing, particle system, background layers with parallax per chapter
+### 操作方式
+- **桌面端**: 方向键 / WASD 移动，空格/W 跳跃，Shift 翻滚，E 交互，Q 扫描模式（第2章后），Enter 继续对话
+- **移动端**: 虚拟摇杆 + 按钮（触屏设备自动显示）
 
-**Input** (`engine.js`): Keyboard + mouse + touch (mobile joystick). Exposes: `Input.left/right/jump/interact/roll/scan/enter`
+### 画布分辨率
+1280×720（CONFIG.CANVAS_W/CANVAS_H），自动缩放适应窗口保持宽高比。
 
-**Audio** (`engine.js`): Web Audio synthesis only — no external audio files. Functions: `playJump()`, `playLand()`, `playDialogue()`, `playSILO()`, `playPuzzleSolve()`, `playEndingA/B/C()`, etc.
+## 主题系统架构
 
-**Player** (`game.js`): Position, velocity, collision detection, platform tolerance (wider landing than visual), rolling with invincibility frames, climbing, death/respawn
+每个主题（`THEME_DEFS[key]`）包含:
 
-**World** (`game.js`): Loads level data (platforms, interactables, hazards, triggers, decorations), handles periodic platforms (Ch3), turret hazards (Ch2), shadow entity (Ch4 chase)
+| 属性 | 用途 |
+|------|------|
+| `character.bodyShape` | 路由到 `drawCharacter_*` 方法: `angular`（Doodle）, `bean`（GGG）, `cowboy`（RDR）, `pixelated`（Pixel） |
+| `character.eyeScale` | 眼睛大小倍数（GGG 为 1.4, RDR 为 0.85） |
+| `character.legStyle` | `stick`, `tiny`, `thick`, `pixel` |
+| `platform.edgeStyle` | `sketchy`（Doodle/GGG）, `rough`（RDR）, `pixelated`（Pixel） |
+| `background.usePaperTexture` | `true` 纸纹背景，`false` 纯色+扫描线 |
+| `background.scanLines` | Pixel 主题 CRT 扫描线效果 |
+| `particles.shape` | `circle`（默认）, `pixel`（Pixel） |
+| `palette` | 完整颜色集: `bg, sky, accent, gold, ink, paper, danger` 等 |
+| `chapters` | 每章颜色覆盖（`ch1` 到 `ch5`） |
+| `cssClass` | 添加到 `#game-container` 的 CSS 类 |
 
-**Dialogue System** (`game.js`): Queue-based line-by-line typewriter effect with speaker name/color and portrait
+主题切换应用 CSS 类到容器，Renderer 缓存主题颜色。engine.js 中的 `_hexToRgba()` 工具函数将主题颜色转换为 rgba 字符串。
 
-**Puzzle System** (`game.js`): Four puzzle types rendered in overlay divs — `password` (numpad), `circuit` (node grid), `memory` (fragment ordering), `emotion` (Ch5 final puzzle)
+## 常见开发任务
 
-**Level Data** (`story.js`): All 5 chapters defined as objects with `width/height`, `playerStart`, `platforms[]`, `interactables[]`, `hazards[]`, `triggers[]`, `decorations[]`. Chapter passwords: Ch1=1114, circuit solution provided in data.
+### 添加新章节
+1. 在 `story.js` 的 `LevelData.levels` 下添加关卡数据，key 为 `chX_sY`
+2. 定义 platforms, interactables（含对话/谜题）, hazards, triggers, decorations
+3. 如需新调色板，在 `config.js` 的 `MORANDI` 中添加
 
-### Chapter Color Palettes (MORANDI)
-- Ch1 (抵达): Ice blue `ch1` palette
-- Ch2 (深入): Dark red `ch2` palette
-- Ch3 (裂缝): Teal/digital `ch3` palette
-- Ch4 (追逐): Storm white/gray `ch4` palette
-- Ch5 (选择): White/gold `ch5` palette
+### 添加新谜题类型
+1. 在 `Game` 类（`game.js`）中添加渲染方法: `_renderXxxPuzzle()`
+2. 在 `startPuzzle()` 中根据 `puzzleConfig.type` 调用
+3. 添加解答逻辑并调用 `solvePuzzle()` 完成
 
-### Character Visuals (Goose Goose Duck Style)
-All characters drawn as "fat bean" shapes with tiny stubby legs, big eyes, beak, blush marks. Defined in `PORTRAIT_COLORS` (config.js) — each character has: `body, eye, beak, feet, hat` colors.
+### 添加新交互类型
+1. 在 `Renderer.drawInteractable()`（`engine.js`）中添加绘制代码
+2. 在 `triggerInteraction()`（`game.js`）中添加触发逻辑
 
-### Controls
-- **Desktop**: Arrow keys / WASD move, Space/W jump, Shift roll, E interact, Q scan mode (Ch2+), Enter continue dialogue
-- **Mobile**: Virtual joystick + buttons (auto-shown on touch devices)
+### 添加新主题
+1. 在 `config.js` 的 `THEMES` 枚举和 `THEME_DEFS` 对象中添加条目
+2. 在 `style.css` 中添加 CSS 覆盖（如 `.theme-newtheme #dialogue-box`）
+3. 如主题有独特角色身形，在 engine.js 添加 `drawCharacter_newshape()` 方法
+4. 如主题有独特背景层样式，在 engine.js 添加 `_drawBgLayer_newstyle()` 方法
 
----
+### 添加提示终端（游戏内可发现指南）
+在 `story.js` 关卡数据中放置 `type: 'terminal'` 且 `flag` 包含 'hint' 或 'secret' 的交互物。标记由 `Game.flags[]` 追踪并计入 `Game._secretsFound`。
 
-## Running the Game
+### WALKTHROUGH 系统
+内置游戏指南在 `config.js` 的 `WALKTHROUGH` 常量中，提供每章:
+- `name`, `password`, `passwordHint`
+- `secrets[]` — 隐藏发现物
+- `tips[]` — 游戏提示
+- `circuitSolution` — 第2章电路谜题答案
+- `memoryOrder` — 第3章记忆谜题顺序
+- `emotionOrder` — 第5章情感谜题顺序
 
-Open `fracture-game/index.html` directly in a browser. No server required.
-
----
-
-## Common Development Tasks
-
-### Adding a new chapter
-1. Add level data to `story.js` under `LevelData.levels` with key `chX_sY`
-2. Define platforms, interactables (with dialogue/puzzles), hazards, triggers
-3. Add chapter color palette to `MORANDI` in `config.js` if needed
-
-### Adding a new puzzle type
-1. Add render method in `Game` class (`game.js`): `_renderXxxPuzzle()`
-2. Call it from `startPuzzle()` based on `puzzleConfig.type`
-3. Add solve logic and call `solvePuzzle()` when complete
-
-### Adding new interactable types
-1. Add drawing code in `Renderer.drawInteractable()` (`engine.js`)
-2. Add trigger logic in `triggerInteraction()` in `game.js`
-
-### Modifying character visuals
-Edit `PORTRAIT_COLORS` in `config.js` for character-specific colors.
-Edit `Renderer.drawCharacter()` in `engine.js` for drawing logic.
-
-### Modifying physics
-- Player gravity/speed/jump: Edit `CONFIG` in `config.js`
-- Platform collision tolerance: `CONFIG.PLATFORM_TOLERANCE`
-- Roll duration/cooldown: `CONFIG.ROLL_DURATION`, `CONFIG.ROLL_COOLDOWN`
-
----
-
-## Notes
-
-- Game uses IIFE pattern — no global exports, all state in global namespace
-- Canvas resolution: 1280×720 (CONFIG.CANVAS_W/CANVAS_H), auto-scales to viewport
-- No external dependencies — pure vanilla JS
-- The game saves no persistent state (no localStorage) — all progress lost on refresh
+外部攻略: 项目根目录的 `WALKTHROUGH.md`。
