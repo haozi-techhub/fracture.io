@@ -81,7 +81,7 @@ const LevelData = {
                     puzzle: {
                         type: 'password',
                         title: '门禁系统 · 输入密码',
-                        hint: '提示：查看陈维工作日志中的日期……1114',
+                        hint: '提示：在研究站内寻找线索……',
                         answer: '1114',
                         onSolve: () => {
                             Game.flags.ch1_door_open = true;
@@ -193,7 +193,7 @@ const LevelData = {
                     puzzle: {
                         type: 'circuit',
                         title: '电路修复 · 连接断路',
-                        hint: '点击节点连通电路，从左上（金色）连接到右下（红色）',
+                        hint: '提示：观察电路板上的节点布局，找出从源到目标的路径……',
                         size: 4,
                         sources: [0],
                         targets: [15],
@@ -329,7 +329,7 @@ const LevelData = {
                     puzzle: {
                         type: 'memory',
                         title: '记忆拼接 · 还原ARIA-7被创造的场景',
-                        hint: '将碎片按照正确的时间顺序放置',
+                        hint: '按照记忆发生的顺序排列……',
                         pieces: ['激活测试', '情感校准', '陈维的照片', '编号确认'],
                         order: ['激活测试', '情感校准', '陈维的照片', '编号确认'],
                         onSolve: () => {
@@ -611,7 +611,7 @@ const LevelData = {
                     puzzle: {
                         type: 'emotion',
                         title: '排列四块情感核心碎片',
-                        hint: '正确的顺序是什么？好奇是起点，愤怒因为关心。',
+                        hint: '思考情感发展的自然顺序……',
                         emotions: ['好奇', '恐惧', '共情', '愤怒'],
                         answer: ['好奇', '恐惧', '共情', '愤怒'],
                         onSolve: () => {

@@ -1315,38 +1315,13 @@ const Game = {
         let state = new Array(size * size).fill(false);
         if (config.sources) config.sources.forEach(i => state[i] = true);
 
-        // Calculate hint path for visual guide
-        const hintPath = [];
-        const pathNodes = [0, 1, 5, 9, 10, 14, 15]; // The solution path
-        for (let i = 0; i < pathNodes.length - 1; i++) {
-            const from = pathNodes[i];
-            const to = pathNodes[i + 1];
-            const fromRow = Math.floor(from / size);
-            const fromCol = from % size;
-            const toRow = Math.floor(to / size);
-            const toCol = to % size;
-            hintPath.push({ fromRow, fromCol, toRow, toCol });
-        }
-
         container.innerHTML = `
-            <div class="circuit-hint-text">提示：从左上（金色）出发，依次连接：右→下→下→右→下→右→到达右下（红色）</div>
             <div class="circuit-grid" style="grid-template-columns: repeat(${size}, 48px);" id="circuit-grid">
                 ${state.map((s, i) => {
                     const cls = config.sources?.includes(i) ? 'source' :
                                 config.targets?.includes(i) ? 'target' : '';
                     return `<div class="circuit-node ${cls} ${s ? 'active' : ''}" data-idx="${i}"></div>`;
                 }).join('')}
-            </div>
-            <div class="circuit-path-hint" id="circuit-path-hint">
-                <svg width="${size * 48}" height="${size * 48}" style="position:absolute;pointer-events:none;opacity:0.2">
-                    ${hintPath.map(p => {
-                        const x1 = p.fromCol * 48 + 24;
-                        const y1 = p.fromRow * 48 + 24;
-                        const x2 = p.toCol * 48 + 24;
-                        const y2 = p.toRow * 48 + 24;
-                        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#7EFFD4" stroke-width="4" stroke-linecap="round"/>`;
-                    }).join('')}
-                </svg>
             </div>
         `;
         container.querySelectorAll('.circuit-node').forEach(node => {

@@ -469,20 +469,50 @@ body {
 .tip-title { font-size: 13px; font-weight: 700; color: var(--ggd-yellow); margin-bottom: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 .tip-body { font-size: 12px; line-height: 1.7; color: rgba(180, 175, 165, 0.9); }
 .tip-spoiler {
-    display: inline-block;
-    margin-top: 4px;
-    padding: 3px 12px;
-    background: linear-gradient(180deg, rgba(80,65,40,0.5) 0%, rgba(60,48,30,0.5) 100%);
-    border: 1px solid rgba(196,184,138,0.25);
-    border-radius: 8px;
-    color: transparent;
+    margin-top: 8px;
+    border: 1px solid rgba(196,184,138,0.2);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.tip-spoiler summary {
+    padding: 6px 12px;
+    background: linear-gradient(180deg, rgba(80,65,40,0.4) 0%, rgba(60,48,30,0.4) 100%);
+    color: rgba(196,184,138,0.6);
     cursor: pointer;
     font-size: 11px;
-    transition: all 0.3s;
+    transition: all 0.2s;
     user-select: none;
+    list-style: none;
 }
-.tip-spoiler:hover { background: rgba(196,184,138,0.3); border-color: rgba(196,184,138,0.5); }
-.tip-spoiler.revealed { color: var(--ggd-yellow); border-color: var(--ggd-yellow); }
+.tip-spoiler summary:hover {
+    background: rgba(196,184,138,0.2);
+    color: rgba(196,184,138,0.9);
+}
+.tip-spoiler summary::before {
+    content: "▶ ";
+    font-size: 9px;
+}
+.tip-spoiler[open] summary::before {
+    content: "▼ ";
+}
+.spoiler-content {
+    padding: 8px 12px;
+    background: rgba(40,35,28,0.6);
+    border-top: 1px solid rgba(196,184,138,0.1);
+    font-size: 11px;
+    line-height: 1.6;
+    color: rgba(212,168,64,0.85);
+}
+.tips-intro {
+    font-size: 12px;
+    line-height: 1.6;
+    color: rgba(180,175,165,0.75);
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    background: rgba(40,48,58,0.4);
+    border-radius: 6px;
+    border-left: 3px solid rgba(212,168,64,0.3);
+}
 
 .title-buttons {
     display: flex;
@@ -871,10 +901,11 @@ body {
     text-shadow: 2px 2px 0 var(--theme-ink);
 }
 #puzzle-hint {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--theme-text);
-    opacity: 0.85;
+    opacity: 0.6;
     margin-top: 16px;
+    font-style: italic;
 }
 
 /* Puzzle: Password */
@@ -1382,7 +1413,8 @@ body {
     text-shadow: 0 2px 0 rgba(150,50,50,0.3);
 }
 .ch2 #puzzle-hint {
-    color: rgba(200,150,150,0.85);
+    color: rgba(200,150,150,0.55);
+    font-style: italic;
 }
 .ch2 #dialogue-box {
     background: linear-gradient(180deg, rgba(58,40,40,0.96) 0%, rgba(40,25,25,0.96) 100%);

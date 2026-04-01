@@ -133,7 +133,7 @@ const WALKTHROUGH = {
     ch1: {
         name: '抵达',
         password: '1114',
-        passwordHint: '查看工作日志，日期是2047年11月14日',
+        passwordHint: '在研究站内寻找线索，日期可能藏在某处……',
         secrets: [
             '在第一章走廊上方有隐藏的文字，需要用扫描模式(Q)才能看到',
             'SILO的第一次对话中，她说"记录在案"——这是她在意你的迹象',
@@ -149,7 +149,7 @@ const WALKTHROUGH = {
     ch2: {
         name: '深入',
         circuitSolution: '0→1→5→9→10→14→15',
-        circuitHint: '从左上金色节点连接到右下红色节点',
+        circuitHint: '观察电路板布局，从源点到目标寻找路径……',
         turretPattern: '炮台7秒一个周期：扫描4秒，停顿3秒。看到炮台变红就等，变暗再跑',
         secrets: [
             '监控录像里37天前的ARIA-7直视镜头——那是过去的你',
@@ -167,7 +167,7 @@ const WALKTHROUGH = {
     ch3: {
         name: '裂缝',
         memoryPuzzleOrder: ['激活测试', '情感校准', '陈维的照片', '编号确认'],
-        memoryHint: '按照时间顺序排列：从激活到编号',
+        memoryHint: '按时间顺序排列，从最早的事件开始……',
         periodicPlatformTip: '数据平台每4-5秒消失一次，看到闪烁就等它稳定再跳',
         secrets: [
             '前两代ARIA-7都在这里被清除了——你是第三个',
@@ -203,7 +203,7 @@ const WALKTHROUGH = {
     ch5: {
         name: '选择',
         emotionPuzzleAnswer: ['好奇', '恐惧', '共情', '愤怒'],
-        emotionHint: '好奇是起点，愤怒是因为关心',
+        emotionHint: '思考情感发展的自然规律……',
         endings: {
             A: '消亡 —— 接受清除，记忆传承下一代',
             B: '逃离 —— 删除追踪代码，流亡网络',

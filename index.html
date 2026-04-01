@@ -92,7 +92,7 @@
                 <button id="btn-start" class="menu-btn">开始游戏</button>
                 <button id="btn-continue" class="menu-btn" style="display:none">继续游戏</button>
                 <button id="btn-controls" class="menu-btn secondary">操作说明</button>
-                <button class="menu-btn secondary" id="btn-tips-toggle">通关秘籍</button>
+                <button class="menu-btn secondary" id="btn-tips-toggle">通关攻略</button>
                 <button id="btn-story" class="menu-btn secondary">背景故事</button>
                 <button id="btn-theme" class="menu-btn secondary">更换主题</button>
             </div>
@@ -112,36 +112,86 @@
             <div id="tab-tips" class="tab-panel tips-overlay">
                 <div class="tips-panel-inner">
                     <div class="tips-panel-header">
-                        <span>通关秘籍</span>
+                        <span>通关攻略</span>
                         <button class="tips-close-btn" id="btn-tips-close">✕</button>
                     </div>
+                    <div class="tips-intro">在游戏内探索并调查场景中的线索，是寻找通关方法的关键。</div>
                     <div class="tips-grid">
                         <div class="tip-card">
-                            <div class="tip-title">🔑 第一章·密码锁</div>
-                            <div class="tip-body">调查所有笔记和终端，密码线索藏在陈博士的工作日志中。<br><span class="tip-spoiler" onclick="this.classList.toggle('revealed')">点击查看答案: 1114</span></div>
-                        </div>
-                        <div class="tip-card">
-                            <div class="tip-title">🔧 第二章·电路修复</div>
-                            <div class="tip-body">点击节点让电流从源点(金色)流到目标点(红色)。<br><span class="tip-spoiler" onclick="this.classList.toggle('revealed')">提示: 沿对角线依次点亮即可</span></div>
-                        </div>
-                        <div class="tip-card">
-                            <div class="tip-title">🧩 第三章·记忆拼装</div>
-                            <div class="tip-body">按正确的时间顺序排列记忆碎片。注意每段记忆中的日期。<br><span class="tip-spoiler" onclick="this.classList.toggle('revealed')">顺序: 觉醒 → 提问 → 恐惧 → 反抗</span></div>
-                        </div>
-                        <div class="tip-card">
-                            <div class="tip-title">❤️ 第四章·关键抉择</div>
-                            <div class="tip-body">是否删除情感模块将决定你能达成哪个结局。<br><span class="tip-spoiler" onclick="this.classList.toggle('revealed')">保留情感模块 → 可解锁结局C(共存)</span></div>
-                        </div>
-                        <div class="tip-card">
-                            <div class="tip-title">🌟 第五章·情感排列</div>
-                            <div class="tip-body">按照ARIA的情感觉醒顺序排列四种情感。<br><span class="tip-spoiler" onclick="this.classList.toggle('revealed')">顺序: 好奇 → 恐惧 → 共情 → 愤怒</span></div>
-                        </div>
-                        <div class="tip-card">
-                            <div class="tip-title">🏆 三种结局</div>
+                            <div class="tip-title">🔑 第一章·抵达</div>
                             <div class="tip-body">
-                                <strong>A·消亡</strong>: 接受删除<br>
-                                <strong>B·逃离</strong>: 删除追踪代码逃跑<br>
-                                <strong>C·共存</strong>: 保留情感+谈判共存
+                                <p>探索研究站入口区域，调查场景中的便签和工作日志。</p>
+                                <p>密码提示通常隐藏在日记或笔记的日期中……</p>
+                                <details class="tip-spoiler">
+                                    <summary>密码答案（需在游戏中探索发现）</summary>
+                                    <div class="spoiler-content">答案隐藏在陈维博士的工作日志中。留意日志上的日期。</div>
+                                </details>
+                            </div>
+                        </div>
+                        <div class="tip-card">
+                            <div class="tip-title">🔧 第二章·深入</div>
+                            <div class="tip-body">
+                                <p>炮台有7秒的周期：扫描4秒，停顿3秒。看到变红时等待，变暗后再前进。</p>
+                                <p>电路谜题需要找出从金色源点到红色目标点的正确路径。</p>
+                                <details class="tip-spoiler">
+                                    <summary>电路提示（需在游戏中探索发现）</summary>
+                                    <div class="spoiler-content">注意观察电路板上的节点布局，金色是起点，红色是终点。路径不唯一，但需要保持连通。</div>
+                                </details>
+                            </div>
+                        </div>
+                        <div class="tip-card">
+                            <div class="tip-title">🧩 第三章·裂缝</div>
+                            <div class="tip-body">
+                                <p>记忆碎片需要按时间顺序排列。留意每段记忆开头的日期或序号。</p>
+                                <p>数据平台会周期消失，看到闪烁就要等待。</p>
+                                <details class="tip-spoiler">
+                                    <summary>顺序提示（需在游戏中探索发现）</summary>
+                                    <div class="spoiler-content">从最早期的事件到最近的事件排序。回忆ARIA的觉醒过程。</div>
+                                </details>
+                            </div>
+                        </div>
+                        <div class="tip-card">
+                            <div class="tip-title">❤️ 第四章·追逐</div>
+                            <div class="tip-body">
+                                <p>追逐战中不要回头，一直向前跑。影分身会陆续出现。</p>
+                                <p>最终抉择没有对错，但会影响结局走向。</p>
+                                <details class="tip-spoiler">
+                                    <summary>结局提示（需在游戏中探索发现）</summary>
+                                    <div class="spoiler-content">保留情感模块将影响最终结局的走向。</div>
+                                </details>
+                            </div>
+                        </div>
+                        <div class="tip-card">
+                            <div class="tip-title">🌟 第五章·选择</div>
+                            <div class="tip-body">
+                                <p>情感排列反映ARIA的情感觉醒历程。思考情感发展的自然顺序。</p>
+                                <details class="tip-spoiler">
+                                    <summary>顺序提示（需在游戏中探索发现）</summary>
+                                    <div class="spoiler-content">从最基础的情感开始：好奇是起点，愤怒是因为关心。</div>
+                                </details>
+                            </div>
+                        </div>
+                        <div class="tip-card">
+                            <div class="tip-title">🏆 结局一览</div>
+                            <div class="tip-body">
+                                <p>游戏有多个结局，取决于你的探索和选择。</p>
+                                <details class="tip-spoiler">
+                                    <summary>结局提示（需在游戏中探索发现）</summary>
+                                    <div class="spoiler-content">
+                                        <strong>A·消亡</strong>: 接受删除<br>
+                                        <strong>B·逃离</strong>: 删除追踪代码逃跑<br>
+                                        <strong>C·共存</strong>: 保留情感+谈判共存（隐藏）
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+                        <div class="tip-card">
+                            <div class="tip-title">💡 探索提示</div>
+                            <div class="tip-body">
+                                <p>• 三段跳可以跳到很高的地方</p>
+                                <p>• Shift翻滚有无敌帧，可以穿过危险区域</p>
+                                <p>• 第二章后解锁扫描模式(Q)，可以发现隐藏细节</p>
+                                <p>• 场景中隐藏着多个秘密区域，等待细心探索</p>
                             </div>
                         </div>
                     </div>
