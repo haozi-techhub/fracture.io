@@ -1664,16 +1664,6 @@ const Renderer = {
     },
 
     _drawBgLayer(colors, cam, time, chapter) {
-        const ctx = this.ctx;
-        const ox1 = -cam.x * 0.05;
-        this._drawBgFarLayer(colors, ox1, time, chapter);
-        const ox2 = -cam.x * 0.15;
-        this._drawBgMidLayer(colors, ox2, time, chapter);
-        const ox3 = -cam.x * 0.3;
-        this._drawBgNearLayer(colors, ox3, time, chapter);
-    },
-
-    _drawBgLayer(colors, cam, time, chapter) {
         const theme = this._getTheme();
         const handlerName = '_drawBgLayer_' + theme.character.bodyShape;
 

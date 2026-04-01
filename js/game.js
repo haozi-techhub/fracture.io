@@ -60,7 +60,7 @@ const Player = {
         this.jumpBufferTimer = 0;
     },
 
-    update(platforms, hazards) {
+    update(platforms, hazards, time) {
         if (this.dead) return;
 
         // Roll cooldown
@@ -601,6 +601,8 @@ const World = {
         this.hazards = (levelData.hazards || []).map(h => ({
             ...h,
             active: h.active !== undefined ? h.active : true,
+            _origX: h.x,
+            _origY: h.y,
         }));
         this.triggers = (levelData.triggers || []).map(t => ({ ...t, fired: false }));
         this.decorations = levelData.decorations || [];
@@ -853,22 +855,43 @@ const Game = {
                 break;
 
             case GAME_STATES.PLAYING:
-                this._updatePlaying();
+                // ESC key for quit confirm (only on press, not hold)
+                if (Input.justPressed['Escape']) {
+                    Audio.playMenuClick();
+                    this.showQuitConfirm();
+                } else {
+                    this._updatePlaying();
+                }
                 break;
 
             case GAME_STATES.DIALOGUE:
-                if (Input.escape) {
-                    this.skipDialogue();
+                // ESC key can skip dialogue or show quit confirm
+                if (Input.justPressed['Escape']) {
+                    if (this._dialogueFullyDisplayed) {
+                        Audio.playMenuClick();
+                        this.showQuitConfirm();
+                    } else {
+                        this.skipDialogue();
+                    }
                 } else {
                     this._updateDialogue();
                 }
                 break;
 
             case GAME_STATES.PUZZLE:
-                if (Input.escape) this.exitPuzzle();
+                // ESC key for quit confirm (puzzle exit is handled by exit button in puzzle UI)
+                if (Input.justPressed['Escape']) {
+                    Audio.playMenuClick();
+                    this.showQuitConfirm();
+                }
                 break;
 
             case GAME_STATES.CHOICE:
+                // ESC key for quit confirm
+                if (Input.justPressed['Escape']) {
+                    Audio.playMenuClick();
+                    this.showQuitConfirm();
+                }
                 break;
 
             case GAME_STATES.CUTSCENE:
@@ -983,7 +1006,7 @@ const Game = {
     },
 
     _updatePlaying() {
-        Player.update(World.platforms, World.hazards);
+        Player.update(World.platforms, World.hazards, this.time);
         World.update(this.time);
         Camera.follow(Player.x, Player.y, World.width, World.height);
         if (this.chapter === 4 && this.shadowEntity) this.updateShadow();
@@ -1444,6 +1467,32 @@ const Game = {
             this._currentInteractable = null;
         }
         this.puzzleData = null;
+    },
+
+    /* ---- Quit to Menu ---- */
+    showQuitConfirm() {
+        const el = document.getElementById('quit-confirm');
+        el.classList.remove('hidden');
+        el.classList.add('active');
+    },
+
+    hideQuitConfirm() {
+        const el = document.getElementById('quit-confirm');
+        el.classList.add('hidden');
+        el.classList.remove('active');
+    },
+
+    quitToMenu() {
+        this.hideQuitConfirm();
+        document.getElementById('hud').classList.add('hidden');
+        this.state = GAME_STATES.MENU;
+        // Reset game state
+        this.chapter = 1;
+        this.flags = {};
+        this.ending = null;
+        // Show title screen
+        const titleScreen = document.getElementById('title-screen');
+        titleScreen.classList.add('active');
     },
 
     /* ---- Choice System ---- */

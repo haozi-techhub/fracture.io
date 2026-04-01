@@ -1146,6 +1146,11 @@ body {
     padding: 6px 12px;
     box-shadow: 2px 2px 0 var(--theme-ink);
 }
+.hud-controls-right {
+    display: flex;
+    gap: 8px;
+    pointer-events: auto;
+}
 #interact-prompt {
     position: fixed;
     bottom: 120px;
@@ -1178,6 +1183,35 @@ body {
     font-size: 12px;
     margin-right: 4px;
     box-shadow: 2px 2px 0 rgba(26,18,8,0.15);
+}
+
+/* ---- HUD Quit Button ---- */
+.hud-quit-btn {
+    font-size: 16px;
+    font-family: var(--theme-font);
+    color: var(--theme-danger);
+    cursor: pointer;
+    pointer-events: auto;
+    background: var(--theme-bg);
+    border: var(--theme-border-width) solid var(--theme-ink);
+    border-radius: var(--theme-radius);
+    padding: 6px 12px;
+    box-shadow: 2px 2px 0 var(--theme-ink);
+    transition: all 0.2s;
+    min-width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.hud-quit-btn:hover {
+    background: rgba(192, 64, 48, 0.3);
+    color: var(--theme-rose);
+    transform: translateY(-1px);
+    box-shadow: 2px 3px 0 var(--theme-ink);
+}
+.hud-quit-btn:active {
+    transform: translateY(1px);
+    box-shadow: 2px 1px 0 var(--theme-ink);
 }
 
 /* ---- Transition ---- */
@@ -1839,4 +1873,41 @@ body {
 /* Theme transition for smooth switching */
 #game-container, #title-screen, .overlay {
     transition: filter 0.3s ease, background-color 0.3s ease;
+}
+
+/* ---- Quit Confirm ---- */
+#quit-confirm {
+    background: rgba(18, 14, 8, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+.quit-confirm-box {
+    background: rgba(28, 22, 16, 0.98);
+    border: 2px solid rgba(212, 168, 64, 0.3);
+    border-radius: 8px;
+    padding: 32px 40px;
+    text-align: center;
+    box-shadow: 4px 4px 0 rgba(26, 18, 8, 0.4);
+    max-width: 360px;
+}
+.quit-confirm-title {
+    font-family: var(--font-doodle);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ggd-yellow);
+    text-shadow: 2px 2px 0 rgba(26, 18, 8, 0.4);
+    margin-bottom: 12px;
+}
+.quit-confirm-desc {
+    font-size: 15px;
+    color: rgba(180, 175, 165, 0.85);
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+}
+.quit-confirm-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
 }

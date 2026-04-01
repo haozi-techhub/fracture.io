@@ -123,6 +123,35 @@
         }
     }
 
+    /* ---- Quit Confirm ---- */
+    function bindQuitConfirm() {
+        const continueBtn = document.getElementById('btn-quit-continue');
+        const quitBtn = document.getElementById('btn-quit-yes');
+        if (continueBtn) {
+            continueBtn.onclick = () => {
+                Game.hideQuitConfirm();
+            };
+        }
+        if (quitBtn) {
+            quitBtn.onclick = () => {
+                Audio.playMenuClick();
+                Game.quitToMenu();
+            };
+        }
+    }
+
+    /* ---- HUD Quit Button ---- */
+    function bindHudQuitButton() {
+        const quitBtn = document.getElementById('hud-quit-btn');
+        if (quitBtn) {
+            quitBtn.onclick = () => {
+                Audio.resume();
+                Audio.playMenuClick();
+                Game.showQuitConfirm();
+            };
+        }
+    }
+
     /* ---- Update Cinematic Character Colors ---- */
     function updateCinematicColors(colors) {
         if (colors['ARIA']) {
@@ -1054,6 +1083,8 @@
         cinematic.init();
         bindMenuEvents();
         bindTipsToggle();
+        bindQuitConfirm();
+        bindHudQuitButton();
 
         // Theme system
         loadThemePreference();

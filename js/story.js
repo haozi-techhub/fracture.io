@@ -44,7 +44,7 @@ const LevelData = {
             hazards: [
                 // Spike pits in gaps
                 { type: 'spike', x: 500, y: 850, w: 100, h: 30 },
-                { x: 800, y: 850, w: 100, h: 30 },
+                { type: 'spike', x: 800, y: 850, w: 100, h: 30 },
                 // Wind zones (push player right periodically)
                 { type: 'wind', x: 1400, y: 400, w: 200, h: 400, strength: 2.5, interval: 5 },
                 { type: 'wind', x: 3000, y: 200, w: 200, h: 400, strength: 3, interval: 6 },
@@ -109,7 +109,6 @@ const LevelData = {
                     ],
                 },
             ],
-            hazards: [],
             triggers: [
                 {
                     x: 1150, y: 700, w: 60, h: 80,

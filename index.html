@@ -256,7 +256,10 @@
         <!-- HUD -->
         <div id="hud" class="hidden">
             <div id="hud-chapter"></div>
-            <div id="hud-hint-icon" title="提示">💡 <span id="hud-hints">3</span></div>
+            <div class="hud-controls-right">
+                <div id="hud-hint-icon" title="提示">💡 <span id="hud-hints">3</span></div>
+                <button id="hud-quit-btn" class="hud-quit-btn" title="退出游戏 [ESC]">✕</button>
+            </div>
             <div id="interact-prompt" class="hidden">
                 <span class="prompt-key">E</span> <span id="interact-label">调查</span>
             </div>
@@ -264,6 +267,18 @@
 
         <!-- Transition -->
         <div id="transition" class="overlay"></div>
+
+        <!-- Quit Confirm -->
+        <div id="quit-confirm" class="overlay hidden">
+            <div class="quit-confirm-box">
+                <div class="quit-confirm-title">确认退出</div>
+                <div class="quit-confirm-desc">返回主菜单？</div>
+                <div class="quit-confirm-btns">
+                    <button class="menu-btn" id="btn-quit-continue">继续游戏</button>
+                    <button class="menu-btn secondary" id="btn-quit-yes">返回标题</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Mobile Controls -->
         <div id="mobile-controls" class="hidden">
