@@ -614,18 +614,74 @@ function getCurrentTheme() {
     return THEME_DEFS[CURRENT_THEME];
 }
 
+// 每个主题的 UI 派生变量（font, radius, border-width, danger 等）
+const THEME_UI = {
+    [THEMES.DOODLE]: {
+        font: "'Caveat', cursive",
+        radius: '4px',
+        borderWidth: '2px',
+        danger: '#C04030',
+        bg: MORANDI.bg,
+        ink: MORANDI.charcoal,
+        gold: MORANDI.gold,
+        text: MORANDI.text,
+        paper: MORANDI.paper,
+    },
+    [THEMES.GGG]: {
+        font: "'Fredoka', sans-serif",
+        radius: '12px',
+        borderWidth: '3px',
+        danger: '#E74C3C',
+    },
+    [THEMES.RDR]: {
+        font: "'Playfair Display', 'Bitter', serif",
+        radius: '2px',
+        borderWidth: '2px',
+        danger: '#8B0000',
+    },
+    [THEMES.PIXEL]: {
+        font: "'Press Start 2P', monospace",
+        radius: '0px',
+        borderWidth: '2px',
+        danger: '#e43b44',
+    },
+};
+
 // 切换主题
 function setTheme(themeId) {
     if (THEME_DEFS[themeId]) {
         CURRENT_THEME = themeId;
         const theme = THEME_DEFS[themeId];
 
-        // 同步调色板到 CSS 变量
         const root = document.documentElement;
-        const palette = theme.palette || {};
+
+        // 同步调色板到 CSS 变量
+        // For doodle (palette=null), use MORANDI defaults
+        const defaultPalette = {
+            bg: MORANDI.bg, ink: MORANDI.charcoal, gold: MORANDI.gold,
+            text: MORANDI.text, paper: MORANDI.paper, white: MORANDI.white,
+            red: MORANDI.red, blue: MORANDI.blue, teal: MORANDI.teal,
+            beige: MORANDI.beige, rose: MORANDI.rose, warmGray: MORANDI.warmGray,
+            paperDark: MORANDI.paperDark, inkLight: MORANDI.inkLight,
+            pencil: MORANDI.pencil, charcoal: MORANDI.charcoal,
+        };
+        const palette = theme.palette || defaultPalette;
         Object.entries(palette).forEach(([key, value]) => {
             root.style.setProperty(`--theme-${key}`, value);
         });
+
+        // 同步 UI 派生变量
+        const ui = THEME_UI[themeId] || THEME_UI[THEMES.DOODLE];
+        root.style.setProperty('--theme-font', ui.font);
+        root.style.setProperty('--theme-radius', ui.radius);
+        root.style.setProperty('--theme-border-width', ui.borderWidth);
+        root.style.setProperty('--theme-danger', ui.danger);
+        // Override bg/ink/gold/text/paper if UI specifies them (for doodle fallback)
+        if (ui.bg) root.style.setProperty('--theme-bg', ui.bg);
+        if (ui.ink) root.style.setProperty('--theme-ink', ui.ink);
+        if (ui.gold) root.style.setProperty('--theme-gold', ui.gold);
+        if (ui.text) root.style.setProperty('--theme-text', ui.text);
+        if (ui.paper) root.style.setProperty('--theme-paper', ui.paper);
 
         // 更新容器 CSS 类
         const container = document.getElementById('game-container');

@@ -788,7 +788,7 @@ const Game = {
 
     init() {
         this.state = GAME_STATES.MENU;
-        document.getElementById('title-screen').classList.add('active');
+        // Title screen activation is handled by style picker in main.js
     },
 
     startGame() {
